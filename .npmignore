@@ -1,0 +1,11 @@
+node_modules/
+src/
+public/
+*.html
+*.ts
+!*.d.ts
+vite.config.*
+tsconfig.*
+eslint.config.js
+vitest.config.ts
+.gitlab-ci.yml

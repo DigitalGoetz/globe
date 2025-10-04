@@ -1,0 +1,58 @@
+stages:
+  - install
+  - test
+  - build
+  - publish
+
+default:
+  image: ${NODE_BASE_IMAGE}
+  cache:
+    key:
+      files:
+        - package-lock.json
+    paths:
+      - .npm/
+      - node_modules/
+    policy: pull-push
+  
+install:
+  stage: install
+  script: 
+    - echo "@web-components:registry=https://${CI_SERVER_HOST}/api/v4/groups/${GROUP_ID}/-/packages/npm/" > .npmrc
+    - echo "//${CI_SERVER_HOST}/:_authToken=${GROUP_TOKEN}" >> .npmrc
+    - npm config set registry ${NPM_REGISTRY}
+    - npm install --cache .npm --no-package-lock --prefer-offline
+  artifacts: { paths: [node_modules/], expire_in: 1h }
+  only: [merge_requests, tags]
+
+test:
+  stage: test
+  needs: ["install"]
+  script: ["npm test --if-present"]
+  only: [merge_requests, tags]
+  
+build:
+  stage: build
+  needs: ["install", "test"]
+  script: 
+    - npm run build:lib --if-present
+    - npm pack --json > pack.json
+  artifacts: { paths: [dist/, "*.tgz", pack.json], expire_in: 7d }
+  only: [merge_requests, tags]
+    
+publish:
+  stage: publish
+  needs: ["build"]
+  script:
+    - echo "@web-components:registry=https://${CI_SERVER_HOST}/api/v4/projects/${CI_PROJECT_ID}/packages/npm/" > .npmrc
+    - echo "//${CI_SERVER_HOST}/api/v4/projects/${CI_PROJECT_ID}/packages/npm/:_authToken=${CI_JOB_TOKEN}" >> .npmrc
+    - npm config set registry ${NPM_REGISTRY}
+    - |
+      PKG_VERSION=$(node -p "require('./package.json').version")
+      if [[ "${CI_COMMIT_TAG}" != "v${PKG_VERSION}" ]]; then
+        echo "Tag v${PKG_VERSION} required to publish (current tag: ${CI_COMMIT_TAG})"
+        exit 1
+      fi
+    - npm publish
+  only: [tags]
+  
