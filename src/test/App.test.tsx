@@ -5,6 +5,6 @@ import App from "../App";
 describe("App", () => {
   it("renders without crashing", () => {
     render(<App />);
-    expect(screen.getByText("Component Template")).toBeInTheDocument();
+    expect(screen.getByText("Loading layers...")).toBeInTheDocument();
   });
 });

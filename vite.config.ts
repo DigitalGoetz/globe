@@ -11,8 +11,8 @@ let config: UserConfig = {
     host: true,
     allowedHosts: true,
     proxy: {
-      '/geoserver': {
-        target: 'http://localhost:7000',
+      "/geoserver": {
+        target: "http://localhost:7000",
         changeOrigin: true,
       },
     },
@@ -36,8 +36,8 @@ if (hmr_target !== "localhost") {
         host: hmr_target,
       },
       proxy: {
-        '/geoserver': {
-          target: 'http://localhost:7000',
+        "/geoserver": {
+          target: "http://localhost:7000",
           changeOrigin: true,
         },
       },
