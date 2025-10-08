@@ -1,0 +1,63 @@
+{
+  "name": "@web-components/globe",
+  "version": "0.0.1",
+  "type": "module",
+  "main": "dist/index.js",
+  "module": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "dev": "vite",
+    "dev:full": "concurrently \"npm run dev\" \"node server/dev-api.js\"",
+    "build": "tsc -b && vite build",
+    "build:lib": "vite build --config vite.config.lib.ts && npx tsc --project tsconfig.lib.json",
+    "lint": "eslint .",
+    "format": "prettier --write \"**/*.{json,ts,tsx,css,scss,sass,js,jsx}\"",
+    "format:check": "prettier --check \"**/*.{json,ts,tsx,css,scss,sass,js,jsx}\"",
+    "preview": "vite preview",
+    "test": "vitest run",
+    "test:ui": "vitest --ui"
+  },
+  "dependencies": {
+    "cesium": "^1.121.1",
+    "resium": "^1.17.5"
+  },
+  "peerDependencies": {
+    "@web-components/configuration-provider": "^1.1.1"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.33.0",
+    "@testing-library/jest-dom": "^6.8.0",
+    "@testing-library/react": "^16.3.0",
+    "@testing-library/user-event": "^14.6.1",
+    "@types/node": "^24.6.0",
+    "@types/react": "^18.2.79",
+    "@types/react-dom": "^18.2.25",
+    "@vitejs/plugin-react": "^5.0.0",
+    "eslint": "^9.33.0",
+    "eslint-plugin-react-hooks": "^5.2.0",
+    "eslint-plugin-react-refresh": "^0.4.20",
+    "globals": "^16.3.0",
+    "jsdom": "^26.1.0",
+    "prettier": "^3.6.2",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "sass-embedded": "^1.93.2",
+    "typescript": "~5.8.3",
+    "typescript-eslint": "^8.39.1",
+    "vite": "^7.1.2",
+    "vite-plugin-cesium": "^1.2.23",
+    "vitest": "^3.2.4",
+    "express": "^4.18.2",
+    "cors": "^2.8.5",
+    "concurrently": "^8.2.2"
+  }
+}

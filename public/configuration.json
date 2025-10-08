@@ -1,0 +1,6 @@
+{
+  "mapServer": {
+    "url": "https://geo.digitalgoetz.net/geoserver/wms",
+    "layers": ["natural_earth:hypsometric", "natural_earth:gray_earth"]
+  }
+}
