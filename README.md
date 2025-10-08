@@ -2,6 +2,11 @@
 
 A React component for displaying 3D globe visualization with WMS layer support and trajectory rendering using Cesium.
 
+## Requirements
+
+- Node.js 20.19+ or 22.12+
+- React 18+
+
 ## Installation
 
 ```bash

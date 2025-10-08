@@ -10,12 +10,25 @@ export default defineConfig({
       fileName: "index",
     },
     rollupOptions: {
-      external: ["react"],
+      external: [
+        "react",
+        "react-dom",
+        "cesium",
+        "resium",
+        "@web-components/configuration-provider",
+      ],
       output: {
         globals: {
           react: "React",
+          "react-dom": "ReactDOM",
+          cesium: "Cesium",
+          resium: "Resium",
+          "@web-components/configuration-provider": "ConfigurationProvider",
         },
       },
     },
+  },
+  optimizeDeps: {
+    exclude: ["cesium"],
   },
 });
