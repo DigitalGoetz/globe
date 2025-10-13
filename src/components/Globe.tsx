@@ -1,7 +1,7 @@
 import { Viewer, ImageryLayer, Entity } from "resium";
 import { WebMapServiceImageryProvider, Cartesian3, Color } from "cesium";
 import { useConfig } from "@web-components/configuration-provider";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 
 interface WMSConfig {
   url: string;
@@ -31,6 +31,7 @@ export function Globe({ trajectory }: GlobeProps) {
     config.mapServer.layers[0],
   );
   const [isFullscreen, setIsFullscreen] = useState(false);
+  const globeId = useRef(`globe-${Math.random().toString(36).substr(2, 9)}`);
 
   useEffect(() => {
     const handleFullscreenChange = () => {
@@ -54,31 +55,45 @@ export function Globe({ trajectory }: GlobeProps) {
 
   return (
     <div
+      id={globeId.current}
       style={{
         overflow: "hidden",
         position: "relative",
         height: isFullscreen ? "90vh" : "100%",
         width: isFullscreen ? "90vw" : "100%",
         backgroundColor: "black",
+        isolation: "isolate",
+        contain: "layout style",
       }}
     >
-      <style>{`.cesium-credit-logoContainer { display: none !important; }`}</style>
+      <style>{`
+        #${globeId.current} .cesium-credit-logoContainer { display: none !important; }
+        #${globeId.current} * {
+          box-sizing: border-box;
+        }
+        #${globeId.current} select {
+          all: unset;
+          position: absolute;
+          top: 10px;
+          left: 10px;
+          z-index: 1000;
+          background-color: #424242;
+          color: #ffffff;
+          border: 1px solid #616161;
+          border-radius: 4px;
+          padding: 8px 12px;
+          font-size: 14px;
+          font-family: inherit;
+          cursor: pointer;
+        }
+        #${globeId.current} select:focus {
+          outline: 2px solid #1976d2;
+          outline-offset: 2px;
+        }
+      `}</style>
       <select
         value={selectedLayer}
         onChange={(e) => setSelectedLayer(e.target.value)}
-        style={{
-          position: "absolute",
-          top: "10px",
-          left: "10px",
-          zIndex: 1000,
-          backgroundColor: "#424242",
-          color: "#ffffff",
-          border: "1px solid #616161",
-          borderRadius: "4px",
-          padding: "8px 12px",
-          fontSize: "14px",
-          outline: "none",
-        }}
       >
         {layers.map((layer) => (
           <option key={layer} value={layer}>
