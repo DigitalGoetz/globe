@@ -2,6 +2,9 @@ import { Viewer, ImageryLayer, Entity } from "resium";
 import { WebMapServiceImageryProvider, Cartesian3, Color } from "cesium";
 import { useConfig } from "@web-components/configuration-provider";
 import { useEffect, useState, useRef } from "react";
+import { Ion } from "cesium";
+
+Ion.defaultAccessToken = "";
 
 interface WMSConfig {
   url: string;

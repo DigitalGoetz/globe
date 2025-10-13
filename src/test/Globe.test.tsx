@@ -12,12 +12,15 @@ vi.mock("resium", () => ({
 }));
 
 vi.mock("cesium", () => ({
+  Ion: {
+    defaultAccessToken: "",
+  },
   WebMapServiceImageryProvider: vi.fn(),
   Cartesian3: {
     fromDegrees: vi.fn(),
   },
   Color: {
-    YELLOW: "yellow",
+    ORANGERED: "orangered",
   },
 }));
 
