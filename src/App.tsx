@@ -40,7 +40,17 @@ function App() {
       )}
 
       <div style={{ width: "800px", height: "600px", margin: "20px" }}>
-        <Globe trajectory={trajectory} />
+        <Globe
+          trajectory={trajectory}
+          controls={{
+            baseLayerPicker: false,
+            animation: false,
+            timeline: false,
+            geocoder: false,
+            sceneModePicker: false,
+            navigationHelpButton: false,
+          }}
+        />
       </div>
     </div>
   );

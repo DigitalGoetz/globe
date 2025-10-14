@@ -1,0 +1,27 @@
+.container {
+  position: relative;
+  height: 100%;
+  width: 100%;
+  overflow: hidden;
+  background-color: transparent;
+}
+
+.controls {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  z-index: 1;
+}
+
+.controls select {
+  background-color: rgba(0, 0, 0, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  border-radius: 4px;
+  color: #ffffff;
+  padding: 6px 8px;
+}
+
+.viewer {
+  height: 100%;
+  width: 100%;
+}

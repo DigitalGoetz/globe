@@ -1,137 +1,215 @@
-import { Viewer, ImageryLayer, Entity } from "resium";
-import { WebMapServiceImageryProvider, Cartesian3, Color } from "cesium";
+import {
+  WebMapServiceImageryProvider,
+  Cartesian3,
+  Color,
+  Ion,
+  Viewer as CesiumViewer,
+  ImageryLayer,
+  PolylineGraphics,
+} from "cesium";
+import "cesium/Build/Cesium/Widgets/widgets.css";
 import { useConfig } from "@web-components/configuration-provider";
-import { useEffect, useState, useRef } from "react";
-import { Ion } from "cesium";
+import { useEffect, useMemo, useRef, useState } from "react";
+import styles from "./Globe.module.css";
 
 Ion.defaultAccessToken = "";
 
-interface WMSConfig {
+// Set Cesium base URL to local assets
+declare global {
+  interface Window {
+    CESIUM_BASE_URL?: string;
+  }
+}
+
+window.CESIUM_BASE_URL = "/cesium-assets/Cesium/";
+
+export interface WMSConfig {
   url: string;
   layers: string[];
 }
 
-interface GlobeConfiguration {
+export interface GlobeConfiguration {
   mapServer: WMSConfig;
 }
 
-interface Trajectory {
+export interface Trajectory {
   latitude: number[];
   longitude: number[];
   altitude: number[];
 }
 
-interface GlobeProps {
+export interface GlobeProps {
   trajectory?: Trajectory | null;
+  controls?: GlobeControls;
 }
 
-export function Globe({ trajectory }: GlobeProps) {
-  const config = useConfig<GlobeConfiguration>();
-  const wmsEndpoint = config.mapServer.url;
-  const layers = config.mapServer.layers;
+export interface GlobeControls {
+  baseLayerPicker?: boolean;
+  animation?: boolean;
+  timeline?: boolean;
+  geocoder?: boolean;
+  homeButton?: boolean;
+  fullscreenButton?: boolean;
+  sceneModePicker?: boolean;
+  navigationHelpButton?: boolean;
+  infoBox?: boolean;
+  selectionIndicator?: boolean;
+  shouldAnimate?: boolean;
+  showCredits?: boolean;
+}
 
-  const [selectedLayer, setSelectedLayer] = useState(
-    config.mapServer.layers[0],
+export function Globe({ trajectory, controls }: GlobeProps) {
+  const config = useConfig<GlobeConfiguration>();
+  const mapServerConfig = config?.mapServer;
+  const layers = useMemo(
+    () => mapServerConfig?.layers ?? [],
+    [mapServerConfig],
   );
-  const [isFullscreen, setIsFullscreen] = useState(false);
+  const wmsEndpoint = mapServerConfig?.url ?? "";
+
+  const [selectedLayer, setSelectedLayer] = useState(layers[0] ?? "");
   const globeId = useRef(`globe-${Math.random().toString(36).substr(2, 9)}`);
+  const viewerRef = useRef<CesiumViewer | null>(null);
+  const cesiumContainerRef = useRef<HTMLDivElement>(null);
+  const controlsRef = useRef<GlobeControls>(controls ?? {});
 
   useEffect(() => {
-    const handleFullscreenChange = () => {
-      setIsFullscreen(!!document.fullscreenElement);
+    if (layers.length === 0) {
+      setSelectedLayer("");
+      return;
+    }
+
+    setSelectedLayer((current) =>
+      layers.includes(current) ? current : layers[0],
+    );
+  }, [layers]);
+
+  useEffect(() => {
+    // Set Cesium base URL before creating viewer
+    window.CESIUM_BASE_URL = "/cesium-assets/Cesium/";
+
+    if (cesiumContainerRef.current && !viewerRef.current) {
+      const resolvedControls = {
+        baseLayerPicker: controlsRef.current.baseLayerPicker ?? true,
+        animation: controlsRef.current.animation ?? true,
+        timeline: controlsRef.current.timeline ?? true,
+        geocoder: controlsRef.current.geocoder ?? true,
+        homeButton: controlsRef.current.homeButton ?? true,
+        fullscreenButton: controlsRef.current.fullscreenButton ?? true,
+        sceneModePicker: controlsRef.current.sceneModePicker ?? true,
+        navigationHelpButton: controlsRef.current.navigationHelpButton ?? true,
+        infoBox: controlsRef.current.infoBox ?? true,
+        selectionIndicator: controlsRef.current.selectionIndicator ?? true,
+        shouldAnimate: controlsRef.current.shouldAnimate ?? false,
+      };
+
+      viewerRef.current = new CesiumViewer(cesiumContainerRef.current, {
+        ...resolvedControls,
+        terrainProvider: undefined,
+      });
+
+      applyCreditsVisibility(viewerRef.current, controlsRef.current);
+    }
+
+    return () => {
+      if (viewerRef.current) {
+        viewerRef.current.destroy();
+        viewerRef.current = null;
+      }
     };
-    document.addEventListener("fullscreenchange", handleFullscreenChange);
-    return () =>
-      document.removeEventListener("fullscreenchange", handleFullscreenChange);
   }, []);
 
-  const wmsProvider = wmsEndpoint
-    ? new WebMapServiceImageryProvider({
+  useEffect(() => {
+    if (viewerRef.current && wmsEndpoint && selectedLayer) {
+      const wmsProvider = new WebMapServiceImageryProvider({
         url: wmsEndpoint,
         layers: selectedLayer,
         parameters: {
           transparent: true,
           format: "image/png",
         },
-      })
-    : undefined;
+      });
+
+      viewerRef.current.imageryLayers.removeAll();
+      viewerRef.current.imageryLayers.add(new ImageryLayer(wmsProvider));
+    }
+  }, [selectedLayer, wmsEndpoint]);
+
+  useEffect(() => {
+    if (viewerRef.current && trajectory) {
+      viewerRef.current.entities.removeAll();
+
+      const positions = trajectory.latitude.map((lat, i) =>
+        Cartesian3.fromDegrees(
+          trajectory.longitude[i],
+          lat,
+          trajectory.altitude[i],
+        ),
+      );
+
+      viewerRef.current.entities.add({
+        polyline: new PolylineGraphics({
+          positions,
+          width: 3,
+          material: Color.ORANGERED,
+        }),
+      });
+    }
+  }, [trajectory]);
+
+  useEffect(() => {
+    if (!viewerRef.current || !cesiumContainerRef.current) return;
+
+    const resizeObserverCtor =
+      typeof ResizeObserver !== "undefined" ? ResizeObserver : null;
+
+    if (!resizeObserverCtor) {
+      viewerRef.current.resize();
+      return;
+    }
+
+    const observer = new resizeObserverCtor(() => {
+      viewerRef.current?.resize();
+    });
+
+    observer.observe(cesiumContainerRef.current);
+
+    return () => observer.disconnect();
+  }, []);
+
+  useEffect(() => {
+    controlsRef.current = controls ?? {};
+    if (viewerRef.current) {
+      applyCreditsVisibility(viewerRef.current, controlsRef.current);
+    }
+  }, [controls]);
 
   return (
-    <div
-      id={globeId.current}
-      style={{
-        overflow: "hidden",
-        position: "relative",
-        height: isFullscreen ? "90vh" : "100%",
-        width: isFullscreen ? "90vw" : "100%",
-        backgroundColor: "black",
-        isolation: "isolate",
-        contain: "layout style",
-      }}
-    >
-      <style>{`
-        #${globeId.current} .cesium-credit-logoContainer { display: none !important; }
-        #${globeId.current} * {
-          box-sizing: border-box;
-        }
-        #${globeId.current} select {
-          all: unset;
-          position: absolute;
-          top: 10px;
-          left: 10px;
-          z-index: 1000;
-          background-color: #424242;
-          color: #ffffff;
-          border: 1px solid #616161;
-          border-radius: 4px;
-          padding: 8px 12px;
-          font-size: 14px;
-          font-family: inherit;
-          cursor: pointer;
-        }
-        #${globeId.current} select:focus {
-          outline: 2px solid #1976d2;
-          outline-offset: 2px;
-        }
-      `}</style>
-      <select
-        value={selectedLayer}
-        onChange={(e) => setSelectedLayer(e.target.value)}
-      >
-        {layers.map((layer) => (
-          <option key={layer} value={layer}>
-            {layer}
-          </option>
-        ))}
-      </select>
-
-      {wmsProvider && (
-        <Viewer
-          baseLayerPicker={false}
-          geocoder={false}
-          timeline={false}
-          animation={false}
-          fullscreenButton={true}
-          style={{ height: "100%", width: "100%" }}
+    <div id={globeId.current} className={styles.container}>
+      <div className={styles.controls}>
+        <select
+          value={selectedLayer}
+          onChange={(e) => setSelectedLayer(e.target.value)}
         >
-          <ImageryLayer key={selectedLayer} imageryProvider={wmsProvider} />
-          {trajectory && (
-            <Entity
-              polyline={{
-                positions: trajectory.latitude.map((lat, i) =>
-                  Cartesian3.fromDegrees(
-                    trajectory.longitude[i],
-                    lat,
-                    trajectory.altitude[i],
-                  ),
-                ),
-                width: 3,
-                material: Color.ORANGERED,
-              }}
-            />
-          )}
-        </Viewer>
-      )}
+          {layers.map((layer) => (
+            <option key={layer} value={layer}>
+              {layer}
+            </option>
+          ))}
+        </select>
+      </div>
+      <div ref={cesiumContainerRef} className={styles.viewer} />
     </div>
   );
+}
+
+function applyCreditsVisibility(
+  viewer: CesiumViewer,
+  controlOverrides: GlobeControls,
+) {
+  const showCredits = controlOverrides.showCredits ?? false;
+  const creditContainer = viewer.cesiumWidget.creditContainer;
+  if (creditContainer instanceof HTMLElement) {
+    creditContainer.style.display = showCredits ? "" : "none";
+  }
 }

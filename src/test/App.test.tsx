@@ -1,4 +1,4 @@
-import { render, screen } from "@testing-library/react";
+import { render, screen, waitFor } from "@testing-library/react";
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import App from "../App";
 
@@ -12,43 +12,68 @@ vi.mock("@web-components/configuration-provider", () => ({
   }),
 }));
 
-// Mock Cesium and resium
-vi.mock("resium", () => ({
-  Viewer: ({ children }: { children?: React.ReactNode }) => (
-    <div data-testid="cesium-viewer">{children}</div>
-  ),
-  ImageryLayer: () => <div data-testid="imagery-layer" />,
-  Entity: () => <div data-testid="trajectory-entity" />,
-}));
+const mockTrajectory = {
+  id: "test-1",
+  time: [1703097600000, 1703097610000],
+  latitude: [28.5721, 28.8234],
+  longitude: [-80.648, -79.5967],
+  altitude: [0, 5000],
+  mach: [0.0, 0.5],
+  dynamic_pressure: [0, 200],
+  segment_start: 1703097600000,
+  segment_end: 1703097610000,
+};
 
+// Mock Cesium
 vi.mock("cesium", () => ({
   Ion: {
     defaultAccessToken: "",
   },
+  Viewer: vi.fn().mockImplementation(() => ({
+    imageryLayers: {
+      removeAll: vi.fn(),
+      add: vi.fn(),
+    },
+    entities: {
+      removeAll: vi.fn(),
+      add: vi.fn(),
+    },
+    resize: vi.fn(),
+    destroy: vi.fn(),
+    cesiumWidget: {
+      creditContainer: {
+        style: { display: "" },
+      },
+    },
+  })),
   WebMapServiceImageryProvider: vi.fn(),
+  ImageryLayer: vi.fn(),
   Cartesian3: {
     fromDegrees: vi.fn(),
   },
   Color: {
     ORANGERED: "orangered",
   },
+  PolylineGraphics: vi.fn(),
 }));
 
 describe("App", () => {
   beforeEach(() => {
     vi.clearAllMocks();
     (global.fetch as ReturnType<typeof vi.fn>).mockResolvedValue({
-      json: () => Promise.resolve({}),
+      json: () => Promise.resolve(mockTrajectory),
     });
   });
 
-  it("renders loading state initially", () => {
+  it("renders loading state initially", async () => {
     render(<App />);
     expect(screen.getByText("Loading trajectory data...")).toBeInTheDocument();
+    await waitFor(() => expect(global.fetch).toHaveBeenCalled());
   });
 
-  it("renders Globe component", () => {
+  it("renders Globe component", async () => {
     render(<App />);
     expect(screen.getByText("Globe Component Demo")).toBeInTheDocument();
+    await waitFor(() => expect(global.fetch).toHaveBeenCalled());
   });
 });

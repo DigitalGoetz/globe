@@ -2,26 +2,37 @@ import { render, screen } from "@testing-library/react";
 import { describe, it, expect, vi } from "vitest";
 import { Globe } from "../components/Globe";
 
-// Mock Cesium and resium
-vi.mock("resium", () => ({
-  Viewer: ({ children }: { children?: React.ReactNode }) => (
-    <div data-testid="cesium-viewer">{children}</div>
-  ),
-  ImageryLayer: () => <div data-testid="imagery-layer" />,
-  Entity: () => <div data-testid="trajectory-entity" />,
-}));
-
+// Mock Cesium
 vi.mock("cesium", () => ({
   Ion: {
     defaultAccessToken: "",
   },
+  Viewer: vi.fn().mockImplementation(() => ({
+    imageryLayers: {
+      removeAll: vi.fn(),
+      add: vi.fn(),
+    },
+    entities: {
+      removeAll: vi.fn(),
+      add: vi.fn(),
+    },
+    resize: vi.fn(),
+    destroy: vi.fn(),
+    cesiumWidget: {
+      creditContainer: {
+        style: { display: "" },
+      },
+    },
+  })),
   WebMapServiceImageryProvider: vi.fn(),
+  ImageryLayer: vi.fn(),
   Cartesian3: {
     fromDegrees: vi.fn(),
   },
   Color: {
     ORANGERED: "orangered",
   },
+  PolylineGraphics: vi.fn(),
 }));
 
 vi.mock("@web-components/configuration-provider", () => ({
@@ -51,7 +62,6 @@ describe("Globe", () => {
   it("renders with trajectory when WMS provider exists", () => {
     render(<Globe trajectory={mockTrajectory} />);
     expect(screen.getByRole("combobox")).toBeInTheDocument();
-    expect(screen.getByTestId("cesium-viewer")).toBeInTheDocument();
   });
 
   it("renders layer dropdown with configured layers", () => {
