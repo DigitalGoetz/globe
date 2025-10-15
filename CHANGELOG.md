@@ -1,5 +1,9 @@
 # Globe Changelog
 
+## 1.4.1 [2025-10-15]
+
+- Updated to latest web component baseline config
+
 ## 1.4.0 [2025-10-15]
 
 - Updated package to also install cesium static resources into /public/cesium-assets

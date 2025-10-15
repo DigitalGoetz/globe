@@ -1,6 +1,6 @@
 {
   "name": "@web-components/globe",
-  "version": "1.4.0",
+  "version": "1.4.1",
   "type": "module",
   "main": "dist/index.js",
   "module": "dist/index.js",
@@ -32,13 +32,14 @@
     "format:check": "prettier --check \"**/*.{json,ts,tsx,css,scss,sass,js,jsx}\"",
     "preview": "vite preview",
     "test": "vitest run",
-    "test:ui": "vitest --ui"
+    "test:ui": "vitest --ui",
+    "checkup": "npm test && npm run lint && npm run format && npm run build:lib"
   },
   "dependencies": {
     "cesium": "^1.121.1"
   },
   "peerDependencies": {
-    "@web-components/configuration-provider": "^1.2.0",
+    "@web-components/configuration-provider": "^1.2.1",
     "react": "^18.0.0",
     "react-dom": "^18.0.0"
   },
