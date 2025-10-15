@@ -1,6 +1,6 @@
 {
   "name": "@web-components/globe",
-  "version": "1.3.0",
+  "version": "1.4.0",
   "type": "module",
   "main": "dist/index.js",
   "module": "dist/index.js",
@@ -18,13 +18,15 @@
     "**/*.scss"
   ],
   "files": [
-    "dist"
+    "dist",
+    "scripts/postinstall.mjs"
   ],
   "scripts": {
     "dev": "vite",
     "dev:full": "concurrently \"npm run dev\" \"node server/dev-api.js\"",
     "build": "tsc -b && vite build",
     "build:lib": "vite build --config vite.config.lib.ts && npx tsc --project tsconfig.lib.json && node scripts/copy-assets.mjs",
+    "postinstall": "node scripts/postinstall.mjs",
     "lint": "eslint .",
     "format": "prettier --write \"**/*.{json,ts,tsx,css,scss,sass,js,jsx}\"",
     "format:check": "prettier --check \"**/*.{json,ts,tsx,css,scss,sass,js,jsx}\"",

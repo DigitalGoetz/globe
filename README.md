@@ -13,6 +13,8 @@ A React component for displaying 3D globe visualization with WMS layer support a
 npm install @web-components/globe
 ```
 
+During installation, the package copies the Cesium asset bundle into your application's `public/cesium-assets` directory so it can be served at runtime. Set the environment variable `GLOBE_SKIP_ASSET_COPY=true` if you prefer to manage these files manually.
+
 ## Configuration
 
 The Globe component requires configuration through the `@web-components/configuration-provider`. Create a configuration file:
@@ -25,6 +27,10 @@ The Globe component requires configuration through the `@web-components/configur
   }
 }
 ```
+
+## Cesium Assets
+
+The Globe component expects Cesium static assets to be available under `/cesium-assets` at runtime. After `npm install`, the package copies its bundled assets into `public/cesium-assets` in the installing project. If you customize the destination, update your web server so the assets are served from the same path, or opt out of the automatic copy by setting `GLOBE_SKIP_ASSET_COPY=true` before installation and handling the files yourself.
 
 ## Basic Usage
 

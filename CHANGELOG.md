@@ -1,5 +1,9 @@
 # Globe Changelog
 
+## 1.4.0 [2025-10-15]
+
+- Updated package to also install cesium static resources into /public/cesium-assets
+
 ## 1.3.0 [2025-10-14]
 
 - Updated Globe component to better import into strangely styled parents
