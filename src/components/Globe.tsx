@@ -7,10 +7,9 @@ import {
   ImageryLayer,
   PolylineGraphics,
 } from "cesium";
-import "cesium/Build/Cesium/Widgets/widgets.css";
 import { useConfig } from "@web-components/configuration-provider";
 import { useEffect, useMemo, useRef, useState } from "react";
-import styles from "./Globe.module.css";
+import { ensureGlobeStyles } from "../styleManager";
 
 Ion.defaultAccessToken = "";
 
@@ -59,6 +58,10 @@ export interface GlobeControls {
 }
 
 export function Globe({ trajectory, controls }: GlobeProps) {
+  useEffect(() => {
+    ensureGlobeStyles();
+  }, []);
+
   const config = useConfig<GlobeConfiguration>();
   const mapServerConfig = config?.mapServer;
   const layers = useMemo(
@@ -185,8 +188,8 @@ export function Globe({ trajectory, controls }: GlobeProps) {
   }, [controls]);
 
   return (
-    <div id={globeId.current} className={styles.container}>
-      <div className={styles.controls}>
+    <div id={globeId.current} className="wc-globe-container">
+      <div className="wc-globe-controls">
         <select
           value={selectedLayer}
           onChange={(e) => setSelectedLayer(e.target.value)}
@@ -198,7 +201,7 @@ export function Globe({ trajectory, controls }: GlobeProps) {
           ))}
         </select>
       </div>
-      <div ref={cesiumContainerRef} className={styles.viewer} />
+      <div ref={cesiumContainerRef} className="wc-globe-viewer" />
     </div>
   );
 }

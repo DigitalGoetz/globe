@@ -1,5 +1,9 @@
 # Globe Changelog
 
+## 1.4.2 [2025-10-16]
+
+- Updated to autoinject Globe styling into projects that import the Globe component
+
 ## 1.4.1 [2025-10-15]
 
 - Updated to latest web component baseline config

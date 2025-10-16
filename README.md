@@ -47,6 +47,10 @@ function App() {
 }
 ```
 
+## Styling
+
+The Globe package now injects its required styles (including Cesium widget styles) the first time you import it, so you no longer need a separate `@web-components/globe/style.css` import. The bundled stylesheet is still published for backward compatibility but is entirely optional.
+
 ## Development
 
 ```bash

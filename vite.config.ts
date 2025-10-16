@@ -18,7 +18,7 @@ const commonConfigEntries = {
     force: true,
   },
   assetsInclude: ["**/*.wasm", "**/*.js"],
-}
+};
 
 let config: UserConfig = {
   plugins: [react(), cesium()],
@@ -40,7 +40,6 @@ let config: UserConfig = {
   define: {
     CESIUM_BASE_URL: JSON.stringify("/cesium"),
   },
-  
 };
 
 if (hmr_target !== "localhost") {
