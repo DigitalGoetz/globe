@@ -1,5 +1,9 @@
 # Globe Changelog
 
+## 1.4.3 [2025-10-17]
+- updating pipeline definition3
+
+
 ## 1.4.2 [2025-10-16]
 
 - Updated to autoinject Globe styling into projects that import the Globe component
