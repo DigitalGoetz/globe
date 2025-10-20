@@ -1,3 +1,9 @@
+
+include:
+  - project: rle-dayton/templates
+    ref: develop
+    file: cicd/npm-mirror.gitlab-ci.yml
+
 stages:
   - install
   - test
@@ -21,7 +27,7 @@ install:
     - echo "@web-components:registry=https://${CI_SERVER_HOST}/api/v4/groups/${GROUP_ID}/-/packages/npm/" > .npmrc
     - echo "//${CI_SERVER_HOST}/:_authToken=${GROUP_TOKEN}" >> .npmrc
     - npm config set registry ${NPM_REGISTRY}
-    - npm install --cache .npm  --prefer-offline
+    - npm install --cache .npm  --prefer-offline --no-package-lock
   artifacts: { paths: [node_modules/], expire_in: 1h }
   only: [merge_requests, tags]
 

@@ -1,5 +1,9 @@
 # Globe Changelog
 
+## 1.4.4 [2025-10-20]
+- updated pipeline to use rdc templates
+
+
 ## 1.4.3 [2025-10-17]
 - updating pipeline definition3
 
