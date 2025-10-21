@@ -1,3 +1,8 @@
+include:
+  - project: rle-dayton/templates
+    ref: develop
+    file: cicd/npm-mirror.gitlab-ci.yml
+
 stages:
   - install
   - test

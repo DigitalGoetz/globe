@@ -1,5 +1,9 @@
 # Globe Changelog
 
+## 1.5.0 [2025-10-21]
+- updating to use nexus dependency publishing
+
+
 ## 1.4.7 [2025-10-21]
 - updated package.json files to accomodate missing dependency on alt environments
 
