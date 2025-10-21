@@ -1,5 +1,10 @@
 # Globe Changelog
 
+## 1.5.4 [2025-10-21]
+
+- fixed npm install
+
+
 ## 1.5.3 [2025-10-21]
 
 - bumped config provider version

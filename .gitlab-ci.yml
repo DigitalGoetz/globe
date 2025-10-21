@@ -23,7 +23,7 @@ install:
     - echo "//${CI_SERVER_HOST}/:_authToken=${GROUP_TOKEN}" >> .npmrc
     - npm config set registry ${NPM_REGISTRY}
     - rm -f package-lock.json
-    - npm install --cache .npm  --prefer-offline --no-package-lock
+    - npm install
   artifacts: { paths: [node_modules/], expire_in: 1h }
   only: [merge_requests, tags]
 
