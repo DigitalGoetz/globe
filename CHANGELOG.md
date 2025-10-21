@@ -1,5 +1,9 @@
 # Globe Changelog
 
+## 1.4.6 [2025-10-21]
+- updated package.json files to accomodate missing dependency on alt environments
+
+
 ## 1.4.5 [2025-10-21]
 - updated pipelines to remove package-locks (avoids issues with dependencies in different envs)
 
