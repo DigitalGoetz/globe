@@ -1,5 +1,9 @@
 # Globe Changelog
 
+## 1.4.5 [2025-10-21]
+- updated pipelines to remove package-locks (avoids issues with dependencies in different envs)
+
+
 ## 1.4.4 [2025-10-20]
 - updated pipeline to use rdc templates
 
