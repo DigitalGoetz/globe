@@ -1,28 +1,32 @@
 # Globe Changelog
 
+## 1.5.1 [2025-10-21]
+
+- removed package lock
+
 ## 1.5.0 [2025-10-21]
+
 - updating to use nexus dependency publishing
 
-
 ## 1.4.7 [2025-10-21]
-- updated package.json files to accomodate missing dependency on alt environments
 
+- updated package.json files to accomodate missing dependency on alt environments
 
 ## 1.4.6 [2025-10-21]
+
 - updated package.json files to accomodate missing dependency on alt environments
 
-
 ## 1.4.5 [2025-10-21]
+
 - updated pipelines to remove package-locks (avoids issues with dependencies in different envs)
 
-
 ## 1.4.4 [2025-10-20]
+
 - updated pipeline to use rdc templates
 
-
 ## 1.4.3 [2025-10-17]
-- updating pipeline definition3
 
+- updating pipeline definition3
 
 ## 1.4.2 [2025-10-16]
 
