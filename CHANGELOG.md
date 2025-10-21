@@ -1,5 +1,9 @@
 # Globe Changelog
 
+## 1.5.2 [2025-10-21]
+- removed geoservices pipeline inclusion
+
+
 ## 1.5.1 [2025-10-21]
 
 - removed package lock
