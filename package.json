@@ -1,6 +1,6 @@
 {
   "name": "@web-components/globe",
-  "version": "1.4.6",
+  "version": "1.4.7",
   "type": "module",
   "main": "dist/index.js",
   "module": "dist/index.js",
