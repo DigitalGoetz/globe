@@ -1,8 +1,12 @@
 # Globe Changelog
 
-## 1.5.2 [2025-10-21]
-- removed geoservices pipeline inclusion
+## 1.5.3 [2025-10-21]
 
+- bumped config provider version
+
+## 1.5.2 [2025-10-21]
+
+- removed geoservices pipeline inclusion
 
 ## 1.5.1 [2025-10-21]
 
