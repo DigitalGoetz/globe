@@ -1,9 +1,13 @@
 # Globe Changelog
 
+## 1.5.5 [2025-10-22]
+
+- Updated Globe to only display selectable layers when there is more than 1 layer available
+- Updated Globe to zoom in on rendered trajectories
+
 ## 1.5.4 [2025-10-21]
 
 - fixed npm install
-
 
 ## 1.5.3 [2025-10-21]
 

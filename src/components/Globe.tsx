@@ -150,13 +150,19 @@ export function Globe({ trajectory, controls }: GlobeProps) {
         ),
       );
 
-      viewerRef.current.entities.add({
+      if (positions.length === 0) {
+        return;
+      }
+
+      const entity = viewerRef.current.entities.add({
         polyline: new PolylineGraphics({
           positions,
           width: 3,
           material: Color.ORANGERED,
         }),
       });
+
+      void viewerRef.current.zoomTo(entity);
     }
   }, [trajectory]);
 
@@ -189,18 +195,20 @@ export function Globe({ trajectory, controls }: GlobeProps) {
 
   return (
     <div id={globeId.current} className="wc-globe-container">
-      <div className="wc-globe-controls">
-        <select
-          value={selectedLayer}
-          onChange={(e) => setSelectedLayer(e.target.value)}
-        >
-          {layers.map((layer) => (
-            <option key={layer} value={layer}>
-              {layer}
-            </option>
-          ))}
-        </select>
-      </div>
+      {layers.length > 1 && (
+        <div className="wc-globe-controls">
+          <select
+            value={selectedLayer}
+            onChange={(e) => setSelectedLayer(e.target.value)}
+          >
+            {layers.map((layer) => (
+              <option key={layer} value={layer}>
+                {layer}
+              </option>
+            ))}
+          </select>
+        </div>
+      )}
       <div ref={cesiumContainerRef} className="wc-globe-viewer" />
     </div>
   );

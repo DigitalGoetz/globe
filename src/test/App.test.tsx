@@ -36,8 +36,9 @@ vi.mock("cesium", () => ({
     },
     entities: {
       removeAll: vi.fn(),
-      add: vi.fn(),
+      add: vi.fn().mockReturnValue({ id: "test-entity" }),
     },
+    zoomTo: vi.fn().mockResolvedValue(undefined),
     resize: vi.fn(),
     destroy: vi.fn(),
     cesiumWidget: {
