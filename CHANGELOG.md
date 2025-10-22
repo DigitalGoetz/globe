@@ -1,5 +1,9 @@
 # Globe Changelog
 
+## 1.5.9 [2025-10-22]
+
+- Added stylemanager to help with cesium layouts
+
 ## 1.5.8 [2025-10-22]
 
 - Updated styling assets to support cesium update
