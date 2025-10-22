@@ -1,5 +1,9 @@
 # Globe Changelog
 
+## 1.5.8 [2025-10-22]
+
+- Updated styling assets to support cesium update
+
 ## 1.5.7 [2025-10-22]
 
 - Updated cesium to resolve additional @zip.js issues
