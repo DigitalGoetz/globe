@@ -23,4 +23,15 @@
  * See https://github.com/CesiumGS/cesium/blob/main/LICENSE.md for full licensing details.
  */
 
-import{f as e}from"./chunk-HMXGNDLA.js";function r(t){t=t??e.EMPTY_OBJECT,this.position=t.position,this.normal=t.normal,this.st=t.st,this.bitangent=t.bitangent,this.tangent=t.tangent,this.color=t.color}var n=r;export{n as a};
+import { f as e } from "./chunk-HMXGNDLA.js";
+function r(t) {
+  ((t = t ?? e.EMPTY_OBJECT),
+    (this.position = t.position),
+    (this.normal = t.normal),
+    (this.st = t.st),
+    (this.bitangent = t.bitangent),
+    (this.tangent = t.tangent),
+    (this.color = t.color));
+}
+var n = r;
+export { n as a };
