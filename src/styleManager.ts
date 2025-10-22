@@ -1,4 +1,4 @@
-import styleHref from "./style.css?url";
+import cssText from "./style.css?inline";
 
 const STYLE_ELEMENT_ID = "wc-globe-style-sheet";
 let injected = false;
@@ -18,20 +18,18 @@ export function ensureGlobeStyles() {
     return;
   }
 
-  const existing =
-    document.getElementById(STYLE_ELEMENT_ID) ??
-    head.querySelector<HTMLLinkElement>(`link[href="${styleHref}"]`);
+  const existing = document.getElementById(STYLE_ELEMENT_ID);
   if (existing) {
     injected = true;
     return;
   }
 
-  const link = document.createElement("link");
-  link.id = STYLE_ELEMENT_ID;
-  link.rel = "stylesheet";
-  link.href = styleHref;
-  link.type = "text/css";
+  const style = document.createElement("style");
+  style.id = STYLE_ELEMENT_ID;
+  style.type = "text/css";
 
-  head.appendChild(link);
+  style.appendChild(document.createTextNode(cssText));
+  head.appendChild(style);
+
   injected = true;
 }
