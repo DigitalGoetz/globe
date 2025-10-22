@@ -30,7 +30,7 @@ The Globe component requires configuration through the `@web-components/configur
 
 ## Cesium Assets
 
-The Globe component expects Cesium static assets to be available under `/cesium-assets` at runtime. After `npm install`, the package copies its bundled assets into `public/cesium-assets` in the installing project. If you customize the destination, update your web server so the assets are served from the same path, or opt out of the automatic copy by setting `GLOBE_SKIP_ASSET_COPY=true` before installation and handling the files yourself.
+The Globe component expects Cesium static assets to be available under `/cesium-assets` at runtime. After `npm install`, the package copies its bundled assets into `public/cesium-assets` in the installing project. If you customize the destination, update your web server so the assets are served from the same path, or opt out of the automatic copy by setting `GLOBE_SKIP_ASSET_COPY=true` before installation and handling the files yourself. The development scripts now source these assets directly from the installed `cesium` package, so running `node scripts/copy-assets.mjs` (or `npm run build:lib`) after upgrading Cesium keeps `public/cesium-assets` aligned with the dependency.
 
 ## Basic Usage
 

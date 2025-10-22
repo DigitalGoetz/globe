@@ -23,35 +23,4 @@
  * See https://github.com/CesiumGS/cesium/blob/main/LICENSE.md for full licensing details.
  */
 
-import { a as o } from "./chunk-36M4VMOA.js";
-import "./chunk-PABIYHEA.js";
-import "./chunk-FCCJEZP2.js";
-import "./chunk-6VRQKJFS.js";
-import "./chunk-HICISBVP.js";
-import "./chunk-26UHRUB3.js";
-import "./chunk-IXYLEDPQ.js";
-import "./chunk-26456K5W.js";
-import "./chunk-VPIAW7TM.js";
-import "./chunk-CKDBE4RR.js";
-import "./chunk-GCWYQAXJ.js";
-import "./chunk-QND5YPLT.js";
-import "./chunk-UHBRQJNJ.js";
-import "./chunk-KWW52NRT.js";
-import "./chunk-S2E5UWT4.js";
-import "./chunk-XNSUDY5I.js";
-import { a as t, d as c } from "./chunk-HMXGNDLA.js";
-import "./chunk-V7XA5C77.js";
-import "./chunk-DGHOUIXA.js";
-import "./chunk-Q2UJZ7OW.js";
-import "./chunk-U7V5VQ2T.js";
-import { e as n } from "./chunk-NVZ5L4JK.js";
-function a(r, i) {
-  return (
-    n(i) && (r = o.unpack(r, i)),
-    (r._center = t.clone(r._center)),
-    (r._ellipsoid = c.clone(r._ellipsoid)),
-    o.createGeometry(r)
-  );
-}
-var u = a;
-export { u as default };
+import{a as o}from"./chunk-36M4VMOA.js";import"./chunk-PABIYHEA.js";import"./chunk-FCCJEZP2.js";import"./chunk-6VRQKJFS.js";import"./chunk-HICISBVP.js";import"./chunk-26UHRUB3.js";import"./chunk-IXYLEDPQ.js";import"./chunk-26456K5W.js";import"./chunk-VPIAW7TM.js";import"./chunk-CKDBE4RR.js";import"./chunk-GCWYQAXJ.js";import"./chunk-QND5YPLT.js";import"./chunk-UHBRQJNJ.js";import"./chunk-KWW52NRT.js";import"./chunk-S2E5UWT4.js";import"./chunk-XNSUDY5I.js";import{a as t,d as c}from"./chunk-HMXGNDLA.js";import"./chunk-V7XA5C77.js";import"./chunk-DGHOUIXA.js";import"./chunk-Q2UJZ7OW.js";import"./chunk-U7V5VQ2T.js";import{e as n}from"./chunk-NVZ5L4JK.js";function a(r,i){return n(i)&&(r=o.unpack(r,i)),r._center=t.clone(r._center),r._ellipsoid=c.clone(r._ellipsoid),o.createGeometry(r)}var u=a;export{u as default};

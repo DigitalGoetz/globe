@@ -23,30 +23,4 @@
  * See https://github.com/CesiumGS/cesium/blob/main/LICENSE.md for full licensing details.
  */
 
-import { a as e } from "./chunk-YES4UTDW.js";
-import { a as r } from "./chunk-ZR45J7LY.js";
-import "./chunk-RZMWEK2K.js";
-import "./chunk-6VRQKJFS.js";
-import "./chunk-HICISBVP.js";
-import "./chunk-26UHRUB3.js";
-import "./chunk-VPIAW7TM.js";
-import "./chunk-CKDBE4RR.js";
-import "./chunk-GCWYQAXJ.js";
-import "./chunk-QND5YPLT.js";
-import "./chunk-UHBRQJNJ.js";
-import "./chunk-KWW52NRT.js";
-import "./chunk-S2E5UWT4.js";
-import "./chunk-XNSUDY5I.js";
-import "./chunk-HMXGNDLA.js";
-import "./chunk-V7XA5C77.js";
-import "./chunk-DGHOUIXA.js";
-import "./chunk-Q2UJZ7OW.js";
-import "./chunk-U7V5VQ2T.js";
-import "./chunk-NVZ5L4JK.js";
-function n(o, t) {
-  let m = e.unpackCombineGeometryParameters(o),
-    i = e.combineGeometry(m);
-  return e.packCombineGeometryResults(i, t);
-}
-var c = r(n);
-export { c as default };
+import{a as e}from"./chunk-YES4UTDW.js";import{a as r}from"./chunk-ZR45J7LY.js";import"./chunk-RZMWEK2K.js";import"./chunk-6VRQKJFS.js";import"./chunk-HICISBVP.js";import"./chunk-26UHRUB3.js";import"./chunk-VPIAW7TM.js";import"./chunk-CKDBE4RR.js";import"./chunk-GCWYQAXJ.js";import"./chunk-QND5YPLT.js";import"./chunk-UHBRQJNJ.js";import"./chunk-KWW52NRT.js";import"./chunk-S2E5UWT4.js";import"./chunk-XNSUDY5I.js";import"./chunk-HMXGNDLA.js";import"./chunk-V7XA5C77.js";import"./chunk-DGHOUIXA.js";import"./chunk-Q2UJZ7OW.js";import"./chunk-U7V5VQ2T.js";import"./chunk-NVZ5L4JK.js";function n(o,t){let m=e.unpackCombineGeometryParameters(o),i=e.combineGeometry(m);return e.packCombineGeometryResults(i,t)}var c=r(n);export{c as default};

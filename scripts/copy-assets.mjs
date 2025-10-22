@@ -1,25 +1,42 @@
-import { cp, mkdir } from "node:fs/promises";
-import { dirname, resolve } from "node:path";
+import { cp, mkdir, rm, stat } from "node:fs/promises";
+import { resolve, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
-const sourceDir = resolve(__dirname, "../public/cesium-assets");
-const targetDir = resolve(__dirname, "../dist/cesium-assets");
+const packageRoot = resolve(__dirname, "..");
+const cesiumSource = resolve(packageRoot, "node_modules/cesium/Build/Cesium");
+const assetTargets = [
+  {
+    label: "public",
+    baseDir: resolve(packageRoot, "public/cesium-assets"),
+  },
+  {
+    label: "dist",
+    baseDir: resolve(packageRoot, "dist/cesium-assets"),
+  },
+];
 
-async function copyCesiumAssets() {
+async function syncCesiumAssets() {
   try {
-    await mkdir(targetDir, { recursive: true });
-    await cp(sourceDir, targetDir, { recursive: true });
-    console.log("Copied cesium assets to dist/cesium-assets");
-  } catch (error) {
-    if ((error)?.code === "ENOENT") {
-      console.warn("cesium-assets source directory not found; skipping copy step.");
-      return;
-    }
-    throw error;
+    await stat(cesiumSource);
+  } catch {
+    console.warn(
+      "Cesium assets were not found in node_modules; skipping asset sync."
+    );
+    return;
+  }
+
+  for (const { label, baseDir } of assetTargets) {
+    const targetDir = resolve(baseDir, "Cesium");
+
+    await rm(baseDir, { recursive: true, force: true });
+    await mkdir(baseDir, { recursive: true });
+    await cp(cesiumSource, targetDir, { recursive: true });
+
+    console.log(`Copied Cesium assets from node_modules to ${label}/cesium-assets`);
   }
 }
 
-await copyCesiumAssets();
+await syncCesiumAssets();

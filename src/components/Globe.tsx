@@ -194,12 +194,35 @@ export function Globe({ trajectory, controls }: GlobeProps) {
   }, [controls]);
 
   return (
-    <div id={globeId.current} className="wc-globe-container">
+    <div
+      id={globeId.current}
+      className="wc-globe-container"
+      style={{ position: "relative" }}
+    >
+      <div ref={cesiumContainerRef} className="wc-globe-viewer" />
       {layers.length > 1 && (
-        <div className="wc-globe-controls">
+        <div
+          className="wc-globe-controls"
+          style={{
+            position: "absolute",
+            top: "10px",
+            left: "10px",
+            zIndex: 1000,
+          }}
+        >
           <select
             value={selectedLayer}
             onChange={(e) => setSelectedLayer(e.target.value)}
+            style={{
+              backgroundColor: "#424242",
+              color: "#ffffff",
+              border: "1px solid #616161",
+              borderRadius: "4px",
+              padding: "8px 12px",
+              fontSize: "14px",
+              fontFamily: "inherit",
+              cursor: "pointer",
+            }}
           >
             {layers.map((layer) => (
               <option key={layer} value={layer}>
@@ -209,7 +232,6 @@ export function Globe({ trajectory, controls }: GlobeProps) {
           </select>
         </div>
       )}
-      <div ref={cesiumContainerRef} className="wc-globe-viewer" />
     </div>
   );
 }
