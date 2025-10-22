@@ -1,5 +1,9 @@
 # Globe Changelog
 
+## 1.5.7 [2025-10-22]
+
+- Updated cesium to resolve additional @zip.js issues
+
 ## 1.5.6 [2025-10-22]
 
 - Updated Globe to pin @zip.js dependency to a version that doesn't include a breaking change (2.7.x to 2.8.x moves where some files can be found, breaking cesium)
