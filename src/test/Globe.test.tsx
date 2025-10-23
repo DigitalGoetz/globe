@@ -1,4 +1,4 @@
-import { render } from "@testing-library/react";
+import { render, screen } from "@testing-library/react";
 import { describe, it, expect, vi } from "vitest";
 import { Globe } from "../components/Globe";
 
@@ -14,11 +14,16 @@ vi.mock("cesium", () => ({
     },
     entities: {
       removeAll: vi.fn(),
-      add: vi.fn().mockReturnValue({ id: "test-entity" }),
+      add: vi
+        .fn()
+        .mockImplementation(() => ({ id: "test-entity", position: null })),
     },
     zoomTo: vi.fn().mockResolvedValue(undefined),
     resize: vi.fn(),
     destroy: vi.fn(),
+    scene: {
+      requestRender: vi.fn(),
+    },
     cesiumWidget: {
       creditContainer: {
         style: { display: "" },
@@ -30,8 +35,13 @@ vi.mock("cesium", () => ({
   Cartesian3: {
     fromDegrees: vi.fn(),
   },
+  ConstantPositionProperty: vi.fn().mockImplementation(() => ({
+    setValue: vi.fn(),
+  })),
   Color: {
     ORANGERED: "orangered",
+    YELLOW: "yellow",
+    BLACK: "black",
   },
   PolylineGraphics: vi.fn(),
 }));
@@ -61,8 +71,35 @@ describe("Globe", () => {
   });
 
   it("renders with trajectory when WMS provider exists", () => {
-    render(<Globe trajectory={mockTrajectory} />);
+    render(<Globe trajectory={mockTrajectory} enablePlayback />);
     expect(document.querySelector(".wc-globe-container")).toBeInTheDocument();
+  });
+
+  it("shows playback controls when trajectory includes time data", async () => {
+    render(<Globe trajectory={mockTrajectory} enablePlayback />);
+    const replayButton = await screen.findByRole("button", {
+      name: /replay/i,
+    });
+    const slider = await screen.findByRole("slider");
+    const speedSelect = (await screen.findByLabelText(
+      "Playback speed",
+    )) as HTMLSelectElement;
+
+    expect(replayButton).toBeInTheDocument();
+    expect(slider).toBeInTheDocument();
+    expect(speedSelect).toBeInTheDocument();
+    const speedValues = Array.from(speedSelect.options).map(
+      (option) => option.value,
+    );
+    expect(speedValues).toContain("20");
+    expect(speedValues).toContain("50");
+  });
+
+  it("hides playback controls when disabled via prop", () => {
+    render(<Globe trajectory={mockTrajectory} enablePlayback={false} />);
+    expect(screen.queryByRole("button", { name: /replay/i })).toBeNull();
+    expect(screen.queryByRole("slider")).toBeNull();
+    expect(screen.queryByLabelText("Playback speed")).toBeNull();
   });
 
   it("renders layer dropdown when multiple layers exist", () => {

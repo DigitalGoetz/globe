@@ -71,14 +71,20 @@ npm run build:lib
 | Prop | Type | Description |
 |------|------|-------------|
 | `trajectory` | `Trajectory \| null` | Optional trajectory data to display |
+| `enablePlayback` | `boolean` | Toggles trajectory playback UI and animation (defaults to `true`) |
 
 ### Trajectory Interface
 
 ```typescript
 interface Trajectory {
+  time: number[];
   latitude: number[];
   longitude: number[];
   altitude: number[];
   ...
 }
 ```
+
+### Playback Controls
+
+When the trajectory includes a `time` array that aligns with each latitude/longitude/altitude sample, the globe displays playback controls in the lower-left corner (unless `enablePlayback` is set to `false`). Use the **Replay** button to animate from the start of the trajectory, adjust the speed dropdown (0.5×, 1×, 2×, 10×, 20×, or 50×) to scale playback timing, and drag the slider to scrub to a specific timestamp. The timestamp display updates as you move through the samples.

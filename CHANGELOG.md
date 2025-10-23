@@ -1,5 +1,11 @@
 # Globe Changelog
 
+## 1.6.0 [2025-10-23]
+
+- Added trajectory playback controls with replay button, slider, and animated marker tied to sample timestamps.
+- Added playback speed selector (0.5×, 1×, 2×, 10×, 20×, 50×) to scale trajectory animation timing.
+- Added `enablePlayback` prop to toggle trajectory playback UI and animation.
+
 ## 1.5.9 [2025-10-22]
 
 - Added stylemanager to help with cesium layouts
