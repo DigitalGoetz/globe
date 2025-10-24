@@ -42,6 +42,7 @@ function App() {
       <div style={{ width: "800px", height: "600px", margin: "20px" }}>
         <Globe
           trajectory={trajectory}
+          enablePlayback={true}
           controls={{
             baseLayerPicker: false,
             animation: false,

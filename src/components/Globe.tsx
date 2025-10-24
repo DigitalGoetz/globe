@@ -428,7 +428,7 @@ export function Globe({
 
     clearPlaybackTimer();
     setPlayingState(false);
-    const sampleCount = trajectory?.time?.length ?? 0;
+    const sampleCount = timesRef.current.length;
     const maxIndex = sampleCount > 0 ? sampleCount - 1 : 0;
     const clampedIndex = Math.max(0, Math.min(nextIndex, maxIndex));
     setPlaybackIndex(clampedIndex);
@@ -450,25 +450,15 @@ export function Globe({
   };
 
   const playbackSpeedOptions = [0.5, 1, 2, 10, 20, 50];
-  const playbackSteps =
-    enablePlayback && playbackAvailable && trajectory?.time
-      ? trajectory.time.length
-      : 0;
-  const playbackDataValid =
-    enablePlayback &&
-    playbackAvailable &&
-    !!trajectory &&
-    playbackSteps > 0 &&
-    trajectory.latitude.length === playbackSteps &&
-    trajectory.longitude.length === playbackSteps &&
-    trajectory.altitude.length === playbackSteps;
+  const playbackSteps = playbackAvailable ? timesRef.current.length : 0;
+  const playbackDataValid = enablePlayback && playbackAvailable && playbackSteps > 0;
   const sliderMax = playbackDataValid ? playbackSteps - 1 : 0;
   const clampedSliderValue = playbackDataValid
     ? Math.min(playbackIndex, sliderMax)
     : 0;
   const sliderDisabled = !playbackDataValid || sliderMax === 0;
   const currentTimestamp = playbackDataValid
-    ? trajectory?.time?.[clampedSliderValue]
+    ? timesRef.current[clampedSliderValue]
     : undefined;
 
   const playbackSpeedSelectId = `${globeId.current}-playback-speed`;
