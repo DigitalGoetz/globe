@@ -11,8 +11,9 @@ import {
 } from "cesium";
 import { useConfig } from "@web-components/configuration-provider";
 import type { ChangeEvent } from "react";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState, useId } from "react";
 import { ensureGlobeStyles } from "../styleManager";
+import type { GlobeConfiguration, GlobeProps, GlobeControls } from "../types";
 
 Ion.defaultAccessToken = "";
 
@@ -24,43 +25,6 @@ declare global {
 }
 
 window.CESIUM_BASE_URL = "/cesium-assets/Cesium/";
-
-export interface WMSConfig {
-  url: string;
-  layers: string[];
-}
-
-export interface GlobeConfiguration {
-  mapServer: WMSConfig;
-}
-
-export interface Trajectory {
-  time?: number[];
-  latitude: number[];
-  longitude: number[];
-  altitude: number[];
-}
-
-export interface GlobeProps {
-  trajectory?: Trajectory | null;
-  controls?: GlobeControls;
-  enablePlayback?: boolean;
-}
-
-export interface GlobeControls {
-  baseLayerPicker?: boolean;
-  animation?: boolean;
-  timeline?: boolean;
-  geocoder?: boolean;
-  homeButton?: boolean;
-  fullscreenButton?: boolean;
-  sceneModePicker?: boolean;
-  navigationHelpButton?: boolean;
-  infoBox?: boolean;
-  selectionIndicator?: boolean;
-  shouldAnimate?: boolean;
-  showCredits?: boolean;
-}
 
 export function Globe({
   trajectory,
@@ -80,7 +44,11 @@ export function Globe({
   const wmsEndpoint = mapServerConfig?.url ?? "";
 
   const [selectedLayer, setSelectedLayer] = useState(layers[0] ?? "");
-  const globeId = useRef(`globe-${Math.random().toString(36).substr(2, 9)}`);
+  const generatedId = useId();
+  const globeId = useMemo(
+    () => `globe-${generatedId.replace(/:/g, "-")}`,
+    [generatedId],
+  );
   const viewerRef = useRef<CesiumViewer | null>(null);
   const cesiumContainerRef = useRef<HTMLDivElement>(null);
   const controlsRef = useRef<GlobeControls>(controls ?? {});
@@ -228,7 +196,6 @@ export function Globe({
         viewerRef.current.destroy();
         viewerRef.current = null;
       }
-      setViewerReady(false);
     };
   }, []);
 
@@ -451,7 +418,8 @@ export function Globe({
 
   const playbackSpeedOptions = [0.5, 1, 2, 10, 20, 50];
   const playbackSteps = playbackAvailable ? timesRef.current.length : 0;
-  const playbackDataValid = enablePlayback && playbackAvailable && playbackSteps > 0;
+  const playbackDataValid =
+    enablePlayback && playbackAvailable && playbackSteps > 0;
   const sliderMax = playbackDataValid ? playbackSteps - 1 : 0;
   const clampedSliderValue = playbackDataValid
     ? Math.min(playbackIndex, sliderMax)
@@ -461,38 +429,16 @@ export function Globe({
     ? timesRef.current[clampedSliderValue]
     : undefined;
 
-  const playbackSpeedSelectId = `${globeId.current}-playback-speed`;
+  const playbackSpeedSelectId = `${globeId}-playback-speed`;
 
   return (
-    <div
-      id={globeId.current}
-      className="wc-globe-container"
-      style={{ position: "relative" }}
-    >
+    <div id={globeId} className="wc-globe-container">
       <div ref={cesiumContainerRef} className="wc-globe-viewer" />
       {layers.length > 1 && (
-        <div
-          className="wc-globe-controls"
-          style={{
-            position: "absolute",
-            top: "10px",
-            left: "10px",
-            zIndex: 1000,
-          }}
-        >
+        <div className="wc-globe-controls">
           <select
             value={selectedLayer}
             onChange={(e) => setSelectedLayer(e.target.value)}
-            style={{
-              backgroundColor: "#424242",
-              color: "#ffffff",
-              border: "1px solid #616161",
-              borderRadius: "4px",
-              padding: "8px 12px",
-              fontSize: "14px",
-              fontFamily: "inherit",
-              cursor: "pointer",
-            }}
           >
             {layers.map((layer) => (
               <option key={layer} value={layer}>

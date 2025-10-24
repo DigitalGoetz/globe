@@ -8,17 +8,20 @@
 
 .wc-globe-controls {
   position: absolute;
-  top: 12px;
-  left: 12px;
-  z-index: 1;
+  top: 10px;
+  left: 10px;
+  z-index: 1000;
 }
 
 .wc-globe-controls select {
-  background-color: rgba(0, 0, 0, 0.6);
-  border: 1px solid rgba(255, 255, 255, 0.4);
+  background-color: #424242;
+  border: 1px solid #616161;
   border-radius: 4px;
   color: #ffffff;
-  padding: 6px 8px;
+  padding: 8px 12px;
+  font-size: 14px;
+  font-family: inherit;
+  cursor: pointer;
 }
 
 .wc-globe-viewer {
