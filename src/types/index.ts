@@ -1,5 +1,5 @@
-export type { WMSConfig, GlobeConfiguration } from "./configuration";
+export type { GlobeConfiguration } from "./globe_configuration";
 export type { Trajectory } from "./trajectory";
-export type { GlobeControls } from "./controls";
-export type { GlobeProps } from "./globe";
-export type { Trajectory as AppTrajectory } from "./app";
+export type { GlobeControls } from "./globe_controls";
+export type { GlobeProps } from "./globe_props";
+export type { WMSConfig } from "./wms_configuration";

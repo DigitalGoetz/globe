@@ -71,12 +71,12 @@ describe("Globe", () => {
   });
 
   it("renders with trajectory when WMS provider exists", () => {
-    render(<Globe trajectory={mockTrajectory} enablePlayback />);
+    render(<Globe trajectory={mockTrajectory} />);
     expect(document.querySelector(".wc-globe-container")).toBeInTheDocument();
   });
 
   it("shows playback controls when trajectory includes time data", async () => {
-    render(<Globe trajectory={mockTrajectory} enablePlayback />);
+    render(<Globe trajectory={mockTrajectory} />);
     const replayButton = await screen.findByRole("button", {
       name: /replay/i,
     });
@@ -95,8 +95,12 @@ describe("Globe", () => {
     expect(speedValues).toContain("50");
   });
 
-  it("hides playback controls when disabled via prop", () => {
-    render(<Globe trajectory={mockTrajectory} enablePlayback={false} />);
+  it("hides playback controls when trajectory lacks valid time data", () => {
+    const noTimeTrajectory = {
+      ...mockTrajectory,
+      time: [],
+    };
+    render(<Globe trajectory={noTimeTrajectory} />);
     expect(screen.queryByRole("button", { name: /replay/i })).toBeNull();
     expect(screen.queryByRole("slider")).toBeNull();
     expect(screen.queryByLabelText("Playback speed")).toBeNull();

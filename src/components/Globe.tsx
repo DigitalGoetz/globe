@@ -6,11 +6,7 @@ import { useCesiumViewer } from "../hooks/useCesiumViewer";
 import { useImageryLayer } from "../hooks/useImageryLayer";
 import { useTrajectoryPlayback } from "../hooks/useTrajectoryPlayback";
 
-export function Globe({
-  trajectory,
-  controls,
-  enablePlayback = false,
-}: GlobeProps) {
+export function Globe({ trajectory, controls }: GlobeProps) {
   useEffect(() => {
     ensureGlobeStyles();
   }, []);
@@ -59,12 +55,11 @@ export function Globe({
   } = useTrajectoryPlayback(
     viewerRef,
     trajectory ?? null,
-    enablePlayback,
     viewerReady,
   );
 
   const playbackSpeedSelectId = `${globeId}-playback-speed`;
-  const showPlayback = enablePlayback && playbackAvailable;
+  const showPlayback = playbackAvailable;
 
   return (
     <div id={globeId} className="wc-globe-container">

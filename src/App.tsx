@@ -1,6 +1,6 @@
 import { Globe } from "./components/Globe";
 import { useEffect, useState } from "react";
-import type { Trajectory } from "./types/app";
+import type { Trajectory } from "./types/trajectory";
 
 function App() {
   const [trajectory, setTrajectory] = useState<Trajectory | null>(null);
@@ -31,7 +31,6 @@ function App() {
       <div style={{ width: "800px", height: "600px", margin: "20px" }}>
         <Globe
           trajectory={trajectory}
-          enablePlayback={true}
           controls={{
             baseLayerPicker: false,
             animation: false,

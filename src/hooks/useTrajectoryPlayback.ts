@@ -13,7 +13,6 @@ type TimeoutHandle = ReturnType<typeof setTimeout> | null;
 export function useTrajectoryPlayback(
   viewerRef: React.MutableRefObject<CesiumViewer | null>,
   trajectory: Trajectory | null | undefined,
-  enablePlayback: boolean,
   viewerReady: boolean,
 ) {
   const polylineEntityRef = React.useRef<Entity | null>(null);
@@ -58,12 +57,6 @@ export function useTrajectoryPlayback(
     currentIndex: number,
     skipInitialDelay = false,
   ) => {
-    if (!enablePlayback) {
-      clearPlaybackTimer();
-      setPlayingState(false);
-      return;
-    }
-
     const positions = trajectoryPositionsRef.current;
     const times = timesRef.current;
     if (!isPlayingRef.current) {
@@ -135,7 +128,6 @@ export function useTrajectoryPlayback(
     trajectoryPositionsRef.current = positions;
 
     const hasTimedTrajectory =
-      enablePlayback &&
       Array.isArray(trajectory.time) &&
       trajectory.time.length === positions.length &&
       trajectory.time.length > 0;
@@ -174,23 +166,23 @@ export function useTrajectoryPlayback(
     });
     playbackEntityRef.current = playbackEntity;
     viewerRef.current.scene.requestRender();
-  }, [viewerRef, trajectory, enablePlayback, viewerReady]);
+  }, [viewerRef, trajectory, viewerReady]);
 
   // When playback index changes, update point position
   React.useEffect(() => {
-    if (!enablePlayback || !playbackAvailable) return;
+    if (!playbackAvailable) return;
     const positions = trajectoryPositionsRef.current;
     if (!playbackEntityRef.current || positions.length === 0) return;
     const clampedIndex = Math.min(playbackIndex, positions.length - 1);
     const nextPosition = positions[clampedIndex];
     updatePlaybackPosition(nextPosition);
-  }, [playbackIndex, enablePlayback, playbackAvailable]);
+  }, [playbackIndex, playbackAvailable]);
 
   // Clear timers on unmount
   React.useEffect(() => () => clearPlaybackTimer(), []);
 
   const handleReplay = () => {
-    if (!enablePlayback || !playbackAvailable) return;
+    if (!playbackAvailable) return;
     const totalPositions = trajectoryPositionsRef.current.length;
     const totalTimes = timesRef.current.length;
     if (totalPositions === 0 || totalTimes === 0) return;
@@ -212,7 +204,7 @@ export function useTrajectoryPlayback(
   };
 
   const handleSliderChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    if (!enablePlayback || !playbackAvailable) return;
+    if (!playbackAvailable) return;
     const nextIndex = Number(event.target.value);
     if (Number.isNaN(nextIndex)) return;
     clearPlaybackTimer();
@@ -226,7 +218,7 @@ export function useTrajectoryPlayback(
   const handlePlaybackSpeedChange = (
     event: React.ChangeEvent<HTMLSelectElement>,
   ) => {
-    if (!enablePlayback) return;
+    if (!playbackAvailable) return;
     const rawValue = Number(event.target.value);
     const nextSpeed = Number.isFinite(rawValue) && rawValue > 0 ? rawValue : 1;
     setPlaybackSpeed(nextSpeed);
@@ -238,8 +230,7 @@ export function useTrajectoryPlayback(
 
   const playbackSpeedOptions = React.useMemo(() => [0.5, 1, 2, 10, 20, 50], []);
   const playbackSteps = playbackAvailable ? timesRef.current.length : 0;
-  const playbackDataValid =
-    enablePlayback && playbackAvailable && playbackSteps > 0;
+  const playbackDataValid = playbackAvailable && playbackSteps > 0;
   const sliderMax = playbackDataValid ? playbackSteps - 1 : 0;
   const clampedSliderValue = playbackDataValid
     ? Math.min(playbackIndex, sliderMax)
