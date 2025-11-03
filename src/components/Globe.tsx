@@ -1,61 +1,10 @@
-import {
-  WebMapServiceImageryProvider,
-  Cartesian3,
-  Color,
-  Ion,
-  Viewer as CesiumViewer,
-  ImageryLayer,
-  PolylineGraphics,
-} from "cesium";
 import { useConfig } from "@web-components/configuration-provider";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useState, useId } from "react";
 import { ensureGlobeStyles } from "../styleManager";
-
-Ion.defaultAccessToken = "";
-
-// Set Cesium base URL to local assets
-declare global {
-  interface Window {
-    CESIUM_BASE_URL?: string;
-  }
-}
-
-window.CESIUM_BASE_URL = "/cesium-assets/Cesium/";
-
-export interface WMSConfig {
-  url: string;
-  layers: string[];
-}
-
-export interface GlobeConfiguration {
-  mapServer: WMSConfig;
-}
-
-export interface Trajectory {
-  latitude: number[];
-  longitude: number[];
-  altitude: number[];
-}
-
-export interface GlobeProps {
-  trajectory?: Trajectory | null;
-  controls?: GlobeControls;
-}
-
-export interface GlobeControls {
-  baseLayerPicker?: boolean;
-  animation?: boolean;
-  timeline?: boolean;
-  geocoder?: boolean;
-  homeButton?: boolean;
-  fullscreenButton?: boolean;
-  sceneModePicker?: boolean;
-  navigationHelpButton?: boolean;
-  infoBox?: boolean;
-  selectionIndicator?: boolean;
-  shouldAnimate?: boolean;
-  showCredits?: boolean;
-}
+import type { GlobeConfiguration, GlobeProps } from "../types";
+import { useCesiumViewer } from "../hooks/useCesiumViewer";
+import { useImageryLayer } from "../hooks/useImageryLayer";
+import { useTrajectoryPlayback } from "../hooks/useTrajectoryPlayback";
 
 export function Globe({ trajectory, controls }: GlobeProps) {
   useEffect(() => {
@@ -71,10 +20,15 @@ export function Globe({ trajectory, controls }: GlobeProps) {
   const wmsEndpoint = mapServerConfig?.url ?? "";
 
   const [selectedLayer, setSelectedLayer] = useState(layers[0] ?? "");
-  const globeId = useRef(`globe-${Math.random().toString(36).substr(2, 9)}`);
-  const viewerRef = useRef<CesiumViewer | null>(null);
-  const cesiumContainerRef = useRef<HTMLDivElement>(null);
-  const controlsRef = useRef<GlobeControls>(controls ?? {});
+  const generatedId = useId();
+  const globeId = useMemo(
+    () => `globe-${generatedId.replace(/:/g, "-")}`,
+    [generatedId],
+  );
+  const { cesiumContainerRef, viewerRef, viewerReady } =
+    useCesiumViewer(controls);
+
+  useImageryLayer(viewerRef, wmsEndpoint, selectedLayer);
 
   useEffect(() => {
     if (layers.length === 0) {
@@ -87,142 +41,34 @@ export function Globe({ trajectory, controls }: GlobeProps) {
     );
   }, [layers]);
 
-  useEffect(() => {
-    // Set Cesium base URL before creating viewer
-    window.CESIUM_BASE_URL = "/cesium-assets/Cesium/";
+  const {
+    playbackAvailable,
+    playbackSpeed,
+    handleReplay,
+    handleSliderChange,
+    handlePlaybackSpeedChange,
+    playbackSpeedOptions,
+    sliderMax,
+    clampedSliderValue,
+    sliderDisabled,
+    currentTimestamp,
+  } = useTrajectoryPlayback(
+    viewerRef,
+    trajectory ?? null,
+    viewerReady,
+  );
 
-    if (cesiumContainerRef.current && !viewerRef.current) {
-      const resolvedControls = {
-        baseLayerPicker: controlsRef.current.baseLayerPicker ?? true,
-        animation: controlsRef.current.animation ?? true,
-        timeline: controlsRef.current.timeline ?? true,
-        geocoder: controlsRef.current.geocoder ?? true,
-        homeButton: controlsRef.current.homeButton ?? true,
-        fullscreenButton: controlsRef.current.fullscreenButton ?? true,
-        sceneModePicker: controlsRef.current.sceneModePicker ?? true,
-        navigationHelpButton: controlsRef.current.navigationHelpButton ?? true,
-        infoBox: controlsRef.current.infoBox ?? true,
-        selectionIndicator: controlsRef.current.selectionIndicator ?? true,
-        shouldAnimate: controlsRef.current.shouldAnimate ?? false,
-      };
-
-      viewerRef.current = new CesiumViewer(cesiumContainerRef.current, {
-        ...resolvedControls,
-        terrainProvider: undefined,
-      });
-
-      applyCreditsVisibility(viewerRef.current, controlsRef.current);
-    }
-
-    return () => {
-      if (viewerRef.current) {
-        viewerRef.current.destroy();
-        viewerRef.current = null;
-      }
-    };
-  }, []);
-
-  useEffect(() => {
-    if (viewerRef.current && wmsEndpoint && selectedLayer) {
-      const wmsProvider = new WebMapServiceImageryProvider({
-        url: wmsEndpoint,
-        layers: selectedLayer,
-        parameters: {
-          transparent: true,
-          format: "image/png",
-        },
-      });
-
-      viewerRef.current.imageryLayers.removeAll();
-      viewerRef.current.imageryLayers.add(new ImageryLayer(wmsProvider));
-    }
-  }, [selectedLayer, wmsEndpoint]);
-
-  useEffect(() => {
-    if (viewerRef.current && trajectory) {
-      viewerRef.current.entities.removeAll();
-
-      const positions = trajectory.latitude.map((lat, i) =>
-        Cartesian3.fromDegrees(
-          trajectory.longitude[i],
-          lat,
-          trajectory.altitude[i],
-        ),
-      );
-
-      if (positions.length === 0) {
-        return;
-      }
-
-      const entity = viewerRef.current.entities.add({
-        polyline: new PolylineGraphics({
-          positions,
-          width: 3,
-          material: Color.ORANGERED,
-        }),
-      });
-
-      void viewerRef.current.zoomTo(entity);
-    }
-  }, [trajectory]);
-
-  useEffect(() => {
-    if (!viewerRef.current || !cesiumContainerRef.current) return;
-
-    const resizeObserverCtor =
-      typeof ResizeObserver !== "undefined" ? ResizeObserver : null;
-
-    if (!resizeObserverCtor) {
-      viewerRef.current.resize();
-      return;
-    }
-
-    const observer = new resizeObserverCtor(() => {
-      viewerRef.current?.resize();
-    });
-
-    observer.observe(cesiumContainerRef.current);
-
-    return () => observer.disconnect();
-  }, []);
-
-  useEffect(() => {
-    controlsRef.current = controls ?? {};
-    if (viewerRef.current) {
-      applyCreditsVisibility(viewerRef.current, controlsRef.current);
-    }
-  }, [controls]);
+  const playbackSpeedSelectId = `${globeId}-playback-speed`;
+  const showPlayback = playbackAvailable;
 
   return (
-    <div
-      id={globeId.current}
-      className="wc-globe-container"
-      style={{ position: "relative" }}
-    >
+    <div id={globeId} className="wc-globe-container">
       <div ref={cesiumContainerRef} className="wc-globe-viewer" />
       {layers.length > 1 && (
-        <div
-          className="wc-globe-controls"
-          style={{
-            position: "absolute",
-            top: "10px",
-            left: "10px",
-            zIndex: 1000,
-          }}
-        >
+        <div className="wc-globe-controls">
           <select
             value={selectedLayer}
             onChange={(e) => setSelectedLayer(e.target.value)}
-            style={{
-              backgroundColor: "#424242",
-              color: "#ffffff",
-              border: "1px solid #616161",
-              borderRadius: "4px",
-              padding: "8px 12px",
-              fontSize: "14px",
-              fontFamily: "inherit",
-              cursor: "pointer",
-            }}
           >
             {layers.map((layer) => (
               <option key={layer} value={layer}>
@@ -232,17 +78,54 @@ export function Globe({ trajectory, controls }: GlobeProps) {
           </select>
         </div>
       )}
+      {showPlayback && (
+        <div className="wc-globe-playback">
+          <button
+            type="button"
+            onClick={handleReplay}
+            className="wc-globe-playback-button"
+            disabled={sliderDisabled}
+          >
+            Replay
+          </button>
+          <label
+            className="wc-globe-playback-speed"
+            htmlFor={playbackSpeedSelectId}
+          >
+            <span>Speed</span>
+            <select
+              id={playbackSpeedSelectId}
+              value={playbackSpeed}
+              onChange={handlePlaybackSpeedChange}
+              aria-label="Playback speed"
+            >
+              {playbackSpeedOptions.map((option) => (
+                <option key={option} value={option}>
+                  {Number.isInteger(option)
+                    ? `${option}x`
+                    : `${option.toFixed(1)}x`}
+                </option>
+              ))}
+            </select>
+          </label>
+          <input
+            className="wc-globe-playback-slider"
+            type="range"
+            min={0}
+            max={sliderMax}
+            step={1}
+            value={clampedSliderValue}
+            onChange={handleSliderChange}
+            disabled={sliderDisabled}
+            aria-label="Trajectory playback"
+          />
+          <span className="wc-globe-playback-time">
+            {currentTimestamp
+              ? new Date(currentTimestamp).toLocaleTimeString()
+              : "--:--:--"}
+          </span>
+        </div>
+      )}
     </div>
   );
-}
-
-function applyCreditsVisibility(
-  viewer: CesiumViewer,
-  controlOverrides: GlobeControls,
-) {
-  const showCredits = controlOverrides.showCredits ?? false;
-  const creditContainer = viewer.cesiumWidget.creditContainer;
-  if (creditContainer instanceof HTMLElement) {
-    creditContainer.style.display = showCredits ? "" : "none";
-  }
 }
