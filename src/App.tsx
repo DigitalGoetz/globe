@@ -1,17 +1,6 @@
 import { Globe } from "./components/Globe";
 import { useEffect, useState } from "react";
-
-interface Trajectory {
-  id: string;
-  time: number[];
-  latitude: number[];
-  longitude: number[];
-  altitude: number[];
-  mach: number[];
-  dynamic_pressure: number[];
-  segment_start: number;
-  segment_end: number;
-}
+import type { Trajectory } from "./types/trajectory";
 
 function App() {
   const [trajectory, setTrajectory] = useState<Trajectory | null>(null);

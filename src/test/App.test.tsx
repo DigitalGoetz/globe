@@ -36,11 +36,16 @@ vi.mock("cesium", () => ({
     },
     entities: {
       removeAll: vi.fn(),
-      add: vi.fn().mockReturnValue({ id: "test-entity" }),
+      add: vi
+        .fn()
+        .mockImplementation(() => ({ id: "test-entity", position: null })),
     },
     zoomTo: vi.fn().mockResolvedValue(undefined),
     resize: vi.fn(),
     destroy: vi.fn(),
+    scene: {
+      requestRender: vi.fn(),
+    },
     cesiumWidget: {
       creditContainer: {
         style: { display: "" },
@@ -54,7 +59,12 @@ vi.mock("cesium", () => ({
   },
   Color: {
     ORANGERED: "orangered",
+    YELLOW: "yellow",
+    BLACK: "black",
   },
+  ConstantPositionProperty: vi.fn().mockImplementation(() => ({
+    setValue: vi.fn(),
+  })),
   PolylineGraphics: vi.fn(),
 }));
 
