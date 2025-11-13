@@ -4,6 +4,7 @@ import type { Trajectory } from "./types/trajectory";
 
 function App() {
   const [trajectory, setTrajectory] = useState<Trajectory | null>(null);
+  const [kmlData, setKMLData] = useState<Blob | null>(null);
 
   useEffect(() => {
     fetch("/api/trajectory/1")
@@ -11,6 +12,14 @@ function App() {
       .then((data) => setTrajectory(data))
       .catch(console.error);
   }, []);
+
+  useEffect(() => {
+    fetch("/api/kmltrajectory/1")
+      .then((res) => res.blob())
+      .then((data)=> setKMLData(data))
+      .catch(console.error);
+  }, []);
+  
 
   return (
     <div style={{ backgroundColor: "#333333", minHeight: "100vh" }}>
@@ -31,6 +40,7 @@ function App() {
       <div style={{ width: "800px", height: "600px", margin: "20px" }}>
         <Globe
           trajectory={trajectory}
+          kmlData={kmlData}
           controls={{
             baseLayerPicker: false,
             animation: false,

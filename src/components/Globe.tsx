@@ -5,8 +5,9 @@ import type { GlobeConfiguration, GlobeProps } from "../types";
 import { useCesiumViewer } from "../hooks/useCesiumViewer";
 import { useImageryLayer } from "../hooks/useImageryLayer";
 import { useTrajectoryPlayback } from "../hooks/useTrajectoryPlayback";
+import { KmlDataSource } from "cesium";
 
-export function Globe({ trajectory, controls }: GlobeProps) {
+export function Globe({ trajectory, controls, kmlData }: GlobeProps) {
   useEffect(() => {
     ensureGlobeStyles();
   }, []);
@@ -60,6 +61,15 @@ export function Globe({ trajectory, controls }: GlobeProps) {
 
   const playbackSpeedSelectId = `${globeId}-playback-speed`;
   const showPlayback = playbackAvailable;
+
+  if (viewerRef.current && kmlData) {
+    const options = {
+      camera: viewerRef.current?.camera,
+      canvas: viewerRef.current?.canvas,
+      screenOverlayContainr: viewerRef.current?.container
+    }
+    viewerRef.current.dataSources.add(KmlDataSource.load(kmlData, options));
+  }
 
   return (
     <div id={globeId} className="wc-globe-container">

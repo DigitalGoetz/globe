@@ -13,9 +13,14 @@ app.use(express.json());
 
 app.get("/trajectory/:id", (req, res) => {
   const trajectoryPath = path.join(__dirname, "trajectory.json");
-  const trajectoryData = JSON.parse(fs.readFileSync(trajectoryPath, "utf8"));
+  const trajectoryData = JSON.parse(fs.readFileSync(trajectoryPath, "utf8"));  
   res.json(trajectoryData);
 });
+
+app.get("/kmltrajectory/:id", (req, res) =>{
+  const kmlPath = path.join(__dirname, "KML_Sample.kml");
+  res.sendFile(kmlPath);
+})
 
 const PORT = 3001;
 app.listen(PORT, () => {
