@@ -1,5 +1,9 @@
 # Globe Changelog
 
+## 1.6.1 [2026-01-30]
+
+- Update project to allow React 18 or 19
+
 ## 1.6.0 [2025-10-23]
 
 - Added trajectory playback controls with replay button, slider, and animated marker tied to sample timestamps.
