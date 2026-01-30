@@ -16,10 +16,9 @@ function App() {
   useEffect(() => {
     fetch("/api/kmltrajectory/1")
       .then((res) => res.blob())
-      .then((data)=> setKMLData(data))
+      .then((data) => setKMLData(data))
       .catch(console.error);
   }, []);
-  
 
   return (
     <div style={{ backgroundColor: "#333333", minHeight: "100vh" }}>

@@ -4,5 +4,5 @@ import type { GlobeControls } from "./globe_controls";
 export interface GlobeProps {
   trajectory?: Trajectory | null;
   controls?: GlobeControls;
-  kmlData?: Blob | null
+  kmlData?: Blob | null;
 }

@@ -53,11 +53,7 @@ export function Globe({ trajectory, controls, kmlData }: GlobeProps) {
     clampedSliderValue,
     sliderDisabled,
     currentTimestamp,
-  } = useTrajectoryPlayback(
-    viewerRef,
-    trajectory ?? null,
-    viewerReady,
-  );
+  } = useTrajectoryPlayback(viewerRef, trajectory ?? null, viewerReady);
 
   const playbackSpeedSelectId = `${globeId}-playback-speed`;
   const showPlayback = playbackAvailable;
@@ -66,8 +62,8 @@ export function Globe({ trajectory, controls, kmlData }: GlobeProps) {
     const options = {
       camera: viewerRef.current?.camera,
       canvas: viewerRef.current?.canvas,
-      screenOverlayContainr: viewerRef.current?.container
-    }
+      screenOverlayContainr: viewerRef.current?.container,
+    };
     viewerRef.current.dataSources.add(KmlDataSource.load(kmlData, options));
   }
 
