@@ -1,5 +1,5 @@
 export interface Trajectory {
-  id?: number;
+  id?: number | string;
   time: number[];
   latitude: number[];
   longitude: number[];

@@ -22,6 +22,11 @@ app.get("/kmltrajectory/:id", (req, res) => {
   res.sendFile(kmlPath);
 });
 
+app.get("/czmlData/:id", (req, res) => {
+  const czmlPath = path.join(__dirname, "CZML_Sample.czml");
+  res.sendFile(czmlPath);
+});
+
 const PORT = 3001;
 app.listen(PORT, () => {
   console.log(`Dev API server running on http://localhost:${PORT}`);

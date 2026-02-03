@@ -5,9 +5,9 @@ import type { GlobeConfiguration, GlobeProps } from "../types";
 import { useCesiumViewer } from "../hooks/useCesiumViewer";
 import { useImageryLayer } from "../hooks/useImageryLayer";
 import { useTrajectoryPlayback } from "../hooks/useTrajectoryPlayback";
-import { KmlDataSource } from "cesium";
+import { CzmlDataSource, KmlDataSource } from "cesium";
 
-export function Globe({ trajectory, controls, kmlData }: GlobeProps) {
+export function Globe({ trajectory, controls, kmlData, czmlData, focusRetangle }: GlobeProps) {
   useEffect(() => {
     ensureGlobeStyles();
   }, []);
@@ -65,6 +65,20 @@ export function Globe({ trajectory, controls, kmlData }: GlobeProps) {
       screenOverlayContainr: viewerRef.current?.container,
     };
     viewerRef.current.dataSources.add(KmlDataSource.load(kmlData, options));
+  }
+
+  if (viewerRef.current && czmlData){
+    const setDataSource = async () => {
+      viewerRef.current?.dataSources.remove(viewerRef.current?.dataSources.get(0), true);
+      const czmlSource = new CzmlDataSource();
+      czmlSource.load(czmlData);
+      viewerRef.current?.dataSources.add(czmlSource);
+    }
+    setDataSource();
+  }
+
+  if (viewerRef.current && focusRetangle){
+    viewerRef.current.camera.flyTo({destination: focusRetangle, duration:0})
   }
 
   return (
