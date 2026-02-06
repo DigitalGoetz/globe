@@ -82,7 +82,8 @@ export function useTrajectoryPlayback(
       return;
     }
 
-    const speedFactor = playbackSpeedRef.current > 0 ? playbackSpeedRef.current : 1;
+    const speedFactor =
+      playbackSpeedRef.current > 0 ? playbackSpeedRef.current : 1;
     const baseDelay = Math.max(
       times[currentIndex + 1] - times[currentIndex],
       16,
@@ -269,4 +270,3 @@ export function useTrajectoryPlayback(
     playbackStatus,
   } as const;
 }
-

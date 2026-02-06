@@ -77,15 +77,15 @@ describe("Globe", () => {
 
   it("shows playback controls when trajectory includes time data", async () => {
     render(<Globe trajectory={mockTrajectory} />);
-    const replayButton = await screen.findByRole("button", {
-      name: /replay/i,
+    const playButton = await screen.findByRole("button", {
+      name: /play/i,
     });
     const slider = await screen.findByRole("slider");
     const speedSelect = (await screen.findByLabelText(
       "Playback speed",
     )) as HTMLSelectElement;
 
-    expect(replayButton).toBeInTheDocument();
+    expect(playButton).toBeInTheDocument();
     expect(slider).toBeInTheDocument();
     expect(speedSelect).toBeInTheDocument();
     const speedValues = Array.from(speedSelect.options).map(
@@ -101,7 +101,7 @@ describe("Globe", () => {
       time: [],
     };
     render(<Globe trajectory={noTimeTrajectory} />);
-    expect(screen.queryByRole("button", { name: /replay/i })).toBeNull();
+    expect(screen.queryByRole("button", { name: /play/i })).toBeNull();
     expect(screen.queryByRole("slider")).toBeNull();
     expect(screen.queryByLabelText("Playback speed")).toBeNull();
   });
