@@ -32,7 +32,7 @@
 .wc-globe-playback {
   position: absolute;
   left: 12px;
-  right: 12px;
+  right: 80px;
   bottom: 16px;
   z-index: 1;
   display: flex;
@@ -40,7 +40,7 @@
   gap: 12px;
   padding: 10px 12px;
   border-radius: 6px;
-  background-color: rgba(0, 0, 0, 0.6);
+  background-color: hsl(217, 0%, 17%);
   color: #ffffff;
 }
 
@@ -77,13 +77,25 @@
 }
 
 .wc-globe-playback-button {
-  background-color: #ff7043;
+  background-color: rgb(144, 202, 249);
   border: none;
   border-radius: 4px;
-  color: #ffffff;
+  color: #000000;
   padding: 6px 14px;
   font-size: 14px;
   cursor: pointer;
+  width: 80px;
+  text-align: center;
+}
+
+.wc-globe-playback-buttons-container {
+  display: flex;
+  width: 172px;
+  justify-content: center;
+}
+
+.wc-globe-playback-button + .wc-globe-playback-button {
+  margin-left: 12px;
 }
 
 .wc-globe-playback-button:disabled {
@@ -93,7 +105,7 @@
 
 .wc-globe-playback-slider {
   flex: 1;
-  accent-color: #ff7043;
+  accent-color: rgb(144, 202, 249);
 }
 
 .wc-globe-playback-time {

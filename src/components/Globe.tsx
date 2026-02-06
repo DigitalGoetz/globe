@@ -7,7 +7,13 @@ import { useImageryLayer } from "../hooks/useImageryLayer";
 import { useTrajectoryPlayback } from "../hooks/useTrajectoryPlayback";
 import { CzmlDataSource, KmlDataSource } from "cesium";
 
-export function Globe({ trajectory, controls, kmlData, czmlData, focusRetangle }: GlobeProps) {
+export function Globe({
+  trajectory,
+  controls,
+  kmlData,
+  czmlData,
+  focusRetangle,
+}: GlobeProps) {
   useEffect(() => {
     ensureGlobeStyles();
   }, []);
@@ -45,7 +51,8 @@ export function Globe({ trajectory, controls, kmlData, czmlData, focusRetangle }
   const {
     playbackAvailable,
     playbackSpeed,
-    handleReplay,
+    handlePlayPause,
+    handleReset,
     handleSliderChange,
     handlePlaybackSpeedChange,
     playbackSpeedOptions,
@@ -53,6 +60,7 @@ export function Globe({ trajectory, controls, kmlData, czmlData, focusRetangle }
     clampedSliderValue,
     sliderDisabled,
     currentTimestamp,
+    playbackStatus,
   } = useTrajectoryPlayback(viewerRef, trajectory ?? null, viewerReady);
 
   const playbackSpeedSelectId = `${globeId}-playback-speed`;
@@ -67,19 +75,28 @@ export function Globe({ trajectory, controls, kmlData, czmlData, focusRetangle }
     viewerRef.current.dataSources.add(KmlDataSource.load(kmlData, options));
   }
 
-  if (viewerRef.current && czmlData){
+  if (viewerRef.current && czmlData) {
     const setDataSource = async () => {
-      viewerRef.current?.dataSources.remove(viewerRef.current?.dataSources.get(0), true);
+      viewerRef.current?.dataSources.remove(
+        viewerRef.current?.dataSources.get(0),
+        true,
+      );
       const czmlSource = new CzmlDataSource();
       czmlSource.load(czmlData);
       viewerRef.current?.dataSources.add(czmlSource);
-    }
+    };
     setDataSource();
   }
 
-  if (viewerRef.current && focusRetangle){
-    viewerRef.current.camera.flyTo({destination: focusRetangle, duration:0})
+  if (viewerRef.current && focusRetangle) {
+    viewerRef.current.camera.flyTo({ destination: focusRetangle, duration: 0 });
   }
+
+  const getButtonText = () => {
+    if (playbackStatus === "playing") return "Pause";
+    if (playbackStatus === "paused") return "Resume";
+    return "Play";
+  };
 
   return (
     <div id={globeId} className="wc-globe-container">
@@ -100,14 +117,26 @@ export function Globe({ trajectory, controls, kmlData, czmlData, focusRetangle }
       )}
       {showPlayback && (
         <div className="wc-globe-playback">
-          <button
-            type="button"
-            onClick={handleReplay}
-            className="wc-globe-playback-button"
-            disabled={sliderDisabled}
-          >
-            Replay
-          </button>
+          <div className="wc-globe-playback-buttons-container">
+            <button
+              type="button"
+              onClick={handlePlayPause}
+              className="wc-globe-playback-button"
+              disabled={sliderDisabled}
+            >
+              {getButtonText()}
+            </button>
+            {playbackStatus === "paused" && (
+              <button
+                type="button"
+                onClick={handleReset}
+                className="wc-globe-playback-button"
+                disabled={sliderDisabled}
+              >
+                Reset
+              </button>
+            )}
+          </div>
           <label
             className="wc-globe-playback-speed"
             htmlFor={playbackSpeedSelectId}
