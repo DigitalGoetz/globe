@@ -1,5 +1,9 @@
 # Globe Changelog
 
+## 1.6.2 [2026-02-04]
+
+- Added CZML playback and focus rectangle inputs.
+
 ## 1.6.1 [2026-01-30]
 
 - Update project to allow React 18 or 19

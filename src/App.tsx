@@ -5,8 +5,7 @@ import type { Trajectory } from "./types/trajectory";
 function App() {
   const [trajectory, setTrajectory] = useState<Trajectory | null>(null);
   const [kmlData, setKMLData] = useState<Blob | null>(null);
-  const [czmlData, setCzmlData] = useState<unknown | null>(null);
-
+  const [, setCzmlData] = useState<unknown | null>(null);
 
   useEffect(() => {
     fetch("/api/trajectory/1")
@@ -49,7 +48,7 @@ function App() {
         <Globe
           trajectory={trajectory}
           kmlData={kmlData}
-          // czmlData={czmlData}  
+          // czmlData={czmlData}
           controls={{
             baseLayerPicker: false,
             animation: false,

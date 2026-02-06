@@ -20,11 +20,17 @@ export function useTrajectoryPlayback(
   const trajectoryPositionsRef = React.useRef<Cartesian3[]>([]);
   const timesRef = React.useRef<number[]>([]);
   const playbackTimeoutRef = React.useRef<TimeoutHandle>(null);
-  const isPlayingRef = React.useRef(false);
 
   const [playbackIndex, setPlaybackIndex] = React.useState(0);
   const [playbackSpeed, setPlaybackSpeed] = React.useState(1);
   const [playbackAvailable, setPlaybackAvailable] = React.useState(false);
+  const [playbackStatus, setPlaybackStatus] = React.useState<
+    "stopped" | "playing" | "paused"
+  >("stopped");
+  const playbackStatusRef = React.useRef(playbackStatus);
+  playbackStatusRef.current = playbackStatus;
+  const playbackSpeedRef = React.useRef(playbackSpeed);
+  playbackSpeedRef.current = playbackSpeed;
 
   const clearPlaybackTimer = () => {
     if (playbackTimeoutRef.current !== null) {
@@ -33,25 +39,24 @@ export function useTrajectoryPlayback(
     }
   };
 
-  const setPlayingState = (playing: boolean) => {
-    isPlayingRef.current = playing;
-  };
+  const updatePlaybackPosition = React.useCallback(
+    (nextPosition: Cartesian3 | undefined) => {
+      const playbackEntity = playbackEntityRef.current;
+      if (!playbackEntity || !nextPosition) return;
 
-  const updatePlaybackPosition = (nextPosition: Cartesian3 | undefined) => {
-    const playbackEntity = playbackEntityRef.current;
-    if (!playbackEntity || !nextPosition) return;
+      const positionProperty = playbackEntity.position as {
+        setValue?: (value: Cartesian3) => void;
+      } | null;
 
-    const positionProperty = playbackEntity.position as {
-      setValue?: (value: Cartesian3) => void;
-    } | null;
-
-    if (positionProperty && typeof positionProperty.setValue === "function") {
-      positionProperty.setValue(nextPosition);
-    } else {
-      playbackEntity.position = new ConstantPositionProperty(nextPosition);
-    }
-    viewerRef.current?.scene.requestRender();
-  };
+      if (positionProperty && typeof positionProperty.setValue === "function") {
+        positionProperty.setValue(nextPosition);
+      } else {
+        playbackEntity.position = new ConstantPositionProperty(nextPosition);
+      }
+      viewerRef.current?.scene.requestRender();
+    },
+    [viewerRef],
+  );
 
   const schedulePlaybackFrom = (
     currentIndex: number,
@@ -59,25 +64,26 @@ export function useTrajectoryPlayback(
   ) => {
     const positions = trajectoryPositionsRef.current;
     const times = timesRef.current;
-    if (!isPlayingRef.current) {
+    if (playbackStatusRef.current !== "playing") {
       clearPlaybackTimer();
       return;
     }
 
     if (positions.length < 2 || times.length < 2) {
       clearPlaybackTimer();
-      setPlayingState(false);
+      setPlaybackStatus("stopped");
       return;
     }
 
     const limit = Math.min(positions.length, times.length) - 1;
     if (currentIndex >= limit) {
       clearPlaybackTimer();
-      setPlayingState(false);
+      setPlaybackStatus("stopped");
       return;
     }
 
-    const speedFactor = playbackSpeed > 0 ? playbackSpeed : 1;
+    const speedFactor =
+      playbackSpeedRef.current > 0 ? playbackSpeedRef.current : 1;
     const baseDelay = Math.max(
       times[currentIndex + 1] - times[currentIndex],
       16,
@@ -87,12 +93,12 @@ export function useTrajectoryPlayback(
 
     clearPlaybackTimer();
     playbackTimeoutRef.current = setTimeout(() => {
-      if (!isPlayingRef.current) return;
+      if (playbackStatusRef.current !== "playing") return;
       const nextIndex = Math.min(currentIndex + 1, limit);
       setPlaybackIndex(nextIndex);
       if (nextIndex >= limit) {
         clearPlaybackTimer();
-        setPlayingState(false);
+        setPlaybackStatus("stopped");
         return;
       }
       schedulePlaybackFrom(nextIndex);
@@ -113,7 +119,7 @@ export function useTrajectoryPlayback(
     trajectoryPositionsRef.current = [];
     timesRef.current = [];
     setPlaybackIndex(0);
-    setPlayingState(false);
+    setPlaybackStatus("stopped");
     setPlaybackAvailable(false);
 
     if (!trajectory) return;
@@ -166,7 +172,7 @@ export function useTrajectoryPlayback(
     });
     playbackEntityRef.current = playbackEntity;
     viewerRef.current.scene.requestRender();
-  }, [viewerRef, trajectory, viewerReady]);
+  }, [viewerRef, trajectory, viewerReady, updatePlaybackPosition]);
 
   // When playback index changes, update point position
   React.useEffect(() => {
@@ -176,31 +182,37 @@ export function useTrajectoryPlayback(
     const clampedIndex = Math.min(playbackIndex, positions.length - 1);
     const nextPosition = positions[clampedIndex];
     updatePlaybackPosition(nextPosition);
-  }, [playbackIndex, playbackAvailable]);
+  }, [playbackIndex, playbackAvailable, updatePlaybackPosition]);
 
   // Clear timers on unmount
   React.useEffect(() => () => clearPlaybackTimer(), []);
 
-  const handleReplay = () => {
+  const handlePlayPause = () => {
     if (!playbackAvailable) return;
-    const totalPositions = trajectoryPositionsRef.current.length;
-    const totalTimes = timesRef.current.length;
-    if (totalPositions === 0 || totalTimes === 0) return;
 
-    clearPlaybackTimer();
-    const totalSamples = Math.min(totalPositions, totalTimes);
-    if (totalSamples <= 1) {
-      const singlePosition = trajectoryPositionsRef.current[0];
-      updatePlaybackPosition(singlePosition);
+    if (playbackStatus === "playing") {
+      setPlaybackStatus("paused");
+      clearPlaybackTimer();
+    } else if (playbackStatus === "paused") {
+      setPlaybackStatus("playing");
+      playbackStatusRef.current = "playing";
+      schedulePlaybackFrom(playbackIndex, true);
+    } else {
+      // 'stopped'
       setPlaybackIndex(0);
-      setPlayingState(false);
-      return;
+      updatePlaybackPosition(trajectoryPositionsRef.current[0]);
+      setPlaybackStatus("playing");
+      playbackStatusRef.current = "playing";
+      schedulePlaybackFrom(0, true);
     }
-    const startPosition = trajectoryPositionsRef.current[0];
-    updatePlaybackPosition(startPosition);
+  };
+
+  const handleReset = () => {
+    if (!playbackAvailable) return;
+    clearPlaybackTimer();
+    setPlaybackStatus("stopped");
     setPlaybackIndex(0);
-    setPlayingState(true);
-    schedulePlaybackFrom(0, true);
+    updatePlaybackPosition(trajectoryPositionsRef.current[0]);
   };
 
   const handleSliderChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -208,7 +220,7 @@ export function useTrajectoryPlayback(
     const nextIndex = Number(event.target.value);
     if (Number.isNaN(nextIndex)) return;
     clearPlaybackTimer();
-    setPlayingState(false);
+    setPlaybackStatus("paused");
     const sampleCount = timesRef.current.length;
     const maxIndex = sampleCount > 0 ? sampleCount - 1 : 0;
     const clampedIndex = Math.max(0, Math.min(nextIndex, maxIndex));
@@ -222,7 +234,7 @@ export function useTrajectoryPlayback(
     const rawValue = Number(event.target.value);
     const nextSpeed = Number.isFinite(rawValue) && rawValue > 0 ? rawValue : 1;
     setPlaybackSpeed(nextSpeed);
-    if (isPlayingRef.current) {
+    if (playbackStatusRef.current === "playing") {
       clearPlaybackTimer();
       schedulePlaybackFrom(playbackIndex);
     }
@@ -247,12 +259,14 @@ export function useTrajectoryPlayback(
     playbackSpeed,
     setPlaybackSpeed,
     playbackSpeedOptions,
-    handleReplay,
+    handlePlayPause,
+    handleReset,
     handleSliderChange,
     handlePlaybackSpeedChange,
     sliderMax,
     clampedSliderValue,
     sliderDisabled,
     currentTimestamp,
+    playbackStatus,
   } as const;
 }
